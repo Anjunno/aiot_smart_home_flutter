@@ -1,20 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>졸업작품 웹페이지</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>젠킨스 테스트 1일차</h1>
-    <p>깃허브 자동 CI/CD 테스트입니다</p>
-    <p>- 준영 24.09.27 21:50 -</p>
+    <header>
+        <h1>졸업작품 웹페이지</h1>
+        <nav>
+            <ul>
+                <li><a href="#about">소개</a></li>
+                <li><a href="#features">특징</a></li>
+                <li><a href="#contact">연락처</a></li>
+                <li><a href="#server">서버 업데이트 내역</a></li>
+                <li><a href="https://github.com/junyoung011019/ProjectAIoT.git">깃허브 (권한 필요)</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <h1>젠킨스 테스트 2일차</h1>
-    <p>깃허브 자동 CI/CD 테스트입니다</p>
-    <p>- 준영 24.09.28 12:13 -</p>
+    <section id="about">
+        <h2>작품 소개</h2>
+        <p>안녕하세요 컴퓨터소프트웨어학과 졸업작품 페이지입니다.</p>
+    </section>
 
-    <p>깃허브 자동 CI/CD 최종 테스트입니다</p>
-    <p>- 준영 24.09.28 12:38 -</p>
+    <section id="features">
+        <h2>팀원 소개</h2>
+        <ul>
+            <li><a href="https://github.com/junyoung011019">정준영 (팀장) : 프로젝트 관리, AWS 클라우드를 활용한 서버 프로그래밍(Node.js, 자바 Spring)</a></li>
+            <li><a href="https://github.com/SungChul23">김성철 : 빅스비 캡슐을 활용한 사용자 요청에 따른 로직 구현</a></li>
+            <li><a href="https://github.com/Anjunno">안준섭 : Flutter를 활용한 클라이언트 앱 개발</a></li>
+            <li><a href="https://github.com/Hamdongkun">함동균 : 사용자 전력 데이터 분석 및 홈 네트워크 망 구성, AI 학습 관련 정보 수집</a></li>
+        </ul>
+    </section>
+
+    <section id="contact">
+        <h2>연락처</h2>
+        <p>문의사항이 있으시면 이메일로 연락주세요</p>
+        <p>jungjunyoung1019@gmail.com</p>
+    </section>
+
+    <section id="server">
+        <h2> <정준영> 서버 업데이트 내역  </h2>
+        <h4>20240927</h4>
+        <p>AWS EC2 생성, MySQL 서비스 구축, 개발용 putty(SSH key), winSCP 준비 완료<br>DNS - http://www.jkah.shop 연동완료, 깃허브 개설</p>
+        <h4>20240928</h4>
+        <p>깃허브 - 젠킨스 CI/CD 자동 배포 구축 완료, 서버 시간 설정 완료</p>
+        <br><br>
+        <h4>추후 개선 과제</h4>
+        <p>https ssl 인증서 발급, node.js로 데이터 받을 준비, ec2 재부팅시 고정 아이피 풀림(돈 내야함)</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 남서울대학교 컴퓨터소프트웨어학과 어금지팀. All rights reserved.</p>
+        <p>Last Update 20240928 12:49</p>
+    </footer>
 </body>
 </html>
