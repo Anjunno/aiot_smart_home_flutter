@@ -1,7 +1,10 @@
 const express = require('express')
 const path = require('path');
-require("dotenv").config();
+const dotenv = require('dotenv');
+const https=require('https');
 const PORT=80
+
+dotenv.config();
 
 const app = express()
 app.use(express.static(path.join(__dirname, 'styles')));
@@ -10,10 +13,15 @@ app.use(cors({origin: '*',}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const options = {
+    key: fs.readFileSync(process.env.SSL_KEY),
+    cert: fs.readFileSync(process.env.SSL_CERT)
+};
+
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'main.html'));
 })
 
-app.listen(PORT, function(){
-    console.log("Server on port "+PORT)
-})
+https.createServer(options, app).listen(443, () => {
+    console.log('HTTPS Server live on 443');
+});
