@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path');
 const dotenv = require('dotenv');
 const https=require('https');
-const PORT=80
+const cors = require('cors');
 
 dotenv.config();
 
