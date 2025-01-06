@@ -39,6 +39,8 @@ class _DeviceManagementState extends State<DeviceManagement> {
               onChanged: (bool value) {
                 setState(() {
                   _deviceStates[index] = value; // 상태 업데이트
+                  Map<String, dynamic> a = _devices[index]; //기기 요청 on/off 요청할 때 사용
+                  print(a['deviceName']);
                 });
               },
             ),

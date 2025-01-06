@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'graph/dayGraph.dart';
 import 'graph/deviceGraph.dart';
 import 'graph/monthGraph.dart';
+import 'Theme.dart'; // 테마 상태 관리 클래스를 추가
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -23,13 +25,20 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    // 테마 상태를 가져오기
+    final themeColor = Provider.of<ThemeColor>(context);
+
+    // 테마에 맞는 색상 설정
+    Color activeColor = themeColor.isDark ? Colors.green : Colors.green;
+    Color inactiveColor = themeColor.isDark ? Colors.grey : Colors.grey;
+
     // 화면의 전체 높이를 가져옴
     final double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: screenHeight * 0.8, // 화면의 0%만 차지
+      height: screenHeight * 0.8, // 화면의 0.8만 차지
       margin: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: themeColor.isDark ? Colors.black87 : Colors.grey[200], // 배경 색상
         borderRadius: BorderRadius.all(
           Radius.circular(10),
         ),
@@ -44,7 +53,7 @@ class _MainPageState extends State<MainPage> {
           Container(
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Colors.grey[200],  // 컨테이너의 배경색 설정
+              color: themeColor.isDark ? Colors.black87 : Colors.grey[200],  // 배경 색상
               borderRadius: BorderRadius.all(
                 Radius.circular(10),
               ),
@@ -53,9 +62,9 @@ class _MainPageState extends State<MainPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 // 버튼 또는 아이콘으로 네비게이션 가능
-                _buildNavButton(Icons.electric_bolt, "기기별 전력량", 0),
-                _buildNavButton(Icons.access_time, "일별 전력량", 1),
-                _buildNavButton(Icons.calendar_month, "월별 전력량", 2),
+                _buildNavButton(Icons.electric_bolt, "기기별 전력량", 0, activeColor, inactiveColor),
+                _buildNavButton(Icons.access_time, "일별 전력량", 1, activeColor, inactiveColor),
+                _buildNavButton(Icons.calendar_month, "월별 전력량", 2, activeColor, inactiveColor),
               ],
             ),
           ),
@@ -64,8 +73,8 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  // 네비게이션 버튼을 만드는 메서드
-  Widget _buildNavButton(IconData icon, String label, int index) {
+  // 네비게이션 버튼을 만드는 메서드 (테마에 맞는 색상 적용)
+  Widget _buildNavButton(IconData icon, String label, int index, Color activeColor, Color inactiveColor) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -77,12 +86,12 @@ class _MainPageState extends State<MainPage> {
         children: [
           Icon(
             icon,
-            color: _selectedIndex == index ? Colors.blue : Colors.grey,
+            color: _selectedIndex == index ? activeColor : inactiveColor,
           ),
           Text(
             label,
             style: TextStyle(
-              color: _selectedIndex == index ? Colors.blue : Colors.grey,
+              color: _selectedIndex == index ? activeColor : inactiveColor,
             ),
           ),
         ],
