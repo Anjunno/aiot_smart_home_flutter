@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:smarthometest/deviceManagement_page.dart';
+import 'package:smarthometest/login_page.dart';
+import 'package:smarthometest/myInfoPage.dart';
 import 'package:smarthometest/root_page.dart';
+import 'package:smarthometest/signUp_page.dart';
+import 'package:smarthometest/tab_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,19 +13,53 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  // 테마 변경을 위한 ValueNotifier
+  static final ValueNotifier<ThemeMode> themeNotifier =
+  ValueNotifier(ThemeMode.light);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: RootPage(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier, // 테마 변경 감지를 위한 리스너
+      builder: (_, ThemeMode currentMode, __) {
+        return MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+            useMaterial3: true, // Material3 적용
+          ),
+          darkTheme: ThemeData.dark(), // 다크 모드 테마 설정
+          themeMode: currentMode, // 현재 테마 모드 적용
+          home: RootPage(), // 초기 페이지 설정
+          routes: {
+            LoginPage.routeName: (context) => LoginPage(),
+            RootPage.routeName: (context) => RootPage(),
+            TabPage.routeName: (context) => TabPage(),
+            SignUpPage.routeName: (context) => SignUpPage(),
+            DevicemanagementPage.routeName: (context) => DevicemanagementPage(),
+            MyInfoPage.routeName: (context) => MyInfoPage(),
+          },
+        );
+      },
     );
   }
 }
 
-
-
+// @override
+// Widget build(BuildContext context) {
+//   return MaterialApp(
+//     title: 'Flutter Demo',
+//     theme: ThemeData(
+//       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+//       useMaterial3: true,
+//     ),
+//     home: RootPage(),  // 초기 페이지 설정
+//     routes: {
+//       LoginPage.routeName: (context) => LoginPage(),
+//       RootPage.routeName: (context) => RootPage(),
+//       TabPage.routeName: (context) => TabPage(),
+//       SignUpPage.routeName: (context) => SignUpPage(),
+//       DevicemanagementPage.routeName: (context) => DevicemanagementPage(),
+//     },
+//   );
+// }

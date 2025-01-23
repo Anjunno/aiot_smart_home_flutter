@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:smarthometest/root_page.dart';
 import 'package:smarthometest/tab_page.dart';
 
 class SignUpPage extends StatefulWidget {
+
+  static String routeName = "/SiginUpPage";
+
   const SignUpPage({super.key});
 
   @override
@@ -20,7 +24,8 @@ class _SignUpPageState extends State<SignUpPage> {
           children: [
             Text("This is the Siginup Page"),
             ElevatedButton(
-              onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => TabPage()));},
+              // onPressed: () {Navigator.pushNamed(context, TabPage.routeName);},
+              onPressed: () {Navigator.pushNamedAndRemoveUntil(context, TabPage.routeName, ModalRoute.withName(RootPage.routeName));},
               child: Title( color: Colors.amber, child: Text("SignUp")),
             ),
           ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smarthometest/request.dart'; // 기기 목록을 가져오는 요청 함수 포함
 
 class DevicemanagementPage extends StatefulWidget {
+  static String routeName = "/DevicemanagementPage";
   const DevicemanagementPage({super.key});
 
   @override

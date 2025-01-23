@@ -49,11 +49,11 @@ class _Logo extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset(
-          'good.png',
-          width: isSmallScreen ? 100 : 200,
-          height: isSmallScreen ? 100 : 200,
-        ),
+        // Image.asset(
+        //   'good.png',
+        //   width: isSmallScreen ? 100 : 200,
+        //   height: isSmallScreen ? 100 : 200,
+        // ),
         // FlutterLogo(size: isSmallScreen ? 100 : 200),
         Padding(
           padding: const EdgeInsets.all(16.0),

@@ -4,6 +4,7 @@ import 'package:smarthometest/tab_page.dart';
 import 'package:smarthometest/login_page.dart'; // 로그인 페이지 import
 
 class RootPage extends StatelessWidget {
+  static String routeName = "/RootPage";
   const RootPage({super.key});
 
   // 🔒 Secure Storage 인스턴스 생성 (iOS의 경우 Keychain 사용)
@@ -27,11 +28,11 @@ class RootPage extends StatelessWidget {
         }
 
         // 📌 에러 발생 시 (예외 처리)
-        // if (snapshot.hasError) {
-        //   return const Scaffold(
-        //     body: Center(child: Text('오류가 발생했습니다. 다시 시도해주세요.')),
-        //   );
-        // }
+        if (snapshot.hasError) {
+          return const Scaffold(
+            body: Center(child: Text('오류가 발생했습니다. 다시 시도해주세요.')),
+          );
+        }
 
         // 📌 accessToken이 없으면 로그인 페이지로 이동
         if (snapshot.data == null || snapshot.hasError) {

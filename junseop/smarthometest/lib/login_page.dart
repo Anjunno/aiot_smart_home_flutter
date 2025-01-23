@@ -4,6 +4,7 @@ import 'package:smarthometest/tab_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
+  static String routeName = "/LoginPage";
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +18,13 @@ class LoginPage extends StatelessWidget {
             child: Text('This is the login page'),
           ),
           ElevatedButton(
-            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => TabPage()));},
-            child: Title( color: Colors.amber, child: Text("login")),
+            // onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => TabPage()));},
+            onPressed: () {Navigator.pushNamedAndRemoveUntil(context, TabPage.routeName, (route) => false);},
+            child: Title( color: Colors.amber, child: Text("Login")),
           ),
           ElevatedButton(
-            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpPage()));},
+            // onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpPage()));},
+            onPressed: () {Navigator.pushNamed(context, SignUpPage.routeName);},
             child: Title( color: Colors.amber, child: Text("SignUp")),
           ),
         ],
@@ -29,3 +32,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 }
+// final routes = {
+//   TabPage.routeName: (context) => TabPage(),
+//   SignUpPage.routeName: (context) => SignUpPage(),
+// };
