@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smarthometest/login_page.dart';
 import 'package:smarthometest/myInfoPage.dart';
 import 'package:smarthometest/root_page.dart';
+import 'package:smarthometest/toastMessage.dart';
 
 import 'deviceManagement_page.dart';
 import 'main.dart';
@@ -47,7 +48,9 @@ class _TabPageState extends State<TabPage> {
             onPressed: () {//푸시알림 버튼 눌렀을 때
               setState(() {
                 _notificationsEnabled = !_notificationsEnabled; // 푸시 알림 ON/OFF 토글
+                _notificationsEnabled ? showToast("푸시알림 ON") :  showToast("푸시알림 OFF");
               });
+
             },
             icon: Icon(
               _notificationsEnabled ? Icons.notifications : Icons.notifications_off, // 아이콘 변경
@@ -59,6 +62,9 @@ class _TabPageState extends State<TabPage> {
               MyApp.themeNotifier.value == ThemeMode.light
                   ? ThemeMode.dark
                   : ThemeMode.light;
+              MyApp.themeNotifier.value == ThemeMode.light
+                  ? showToast("Light mode")
+                  : showToast("Dark mode");
             },
             icon: Icon(
               MyApp.themeNotifier.value == ThemeMode.light
@@ -88,6 +94,7 @@ class _TabPageState extends State<TabPage> {
                 // 로그아웃 후 로그인 페이지로 이동
                 Navigator.pushNamedAndRemoveUntil(
                     context, LoginPage.routeName, ModalRoute.withName(RootPage.routeName));
+                showToast("로그아웃");
               },
             ),
           ],
@@ -99,15 +106,31 @@ class _TabPageState extends State<TabPage> {
         child: _pages[_selectedIndex],
       ),
 
-      // 하단 네비게이션 바
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: _onItemTapped, // 탭 변경 이벤트 처리
-        currentIndex: _selectedIndex, // 현재 선택된 탭 표시
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_tree), label: '기기관리'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Colors.grey, width: 1), // 상단 테두리 추가
+          ),
+        ),
+        child: BottomNavigationBar(
+          onTap: _onItemTapped, // 탭 변경 이벤트 처리
+          currentIndex: _selectedIndex, // 현재 선택된 탭 표시
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.account_tree), label: '기기관리'),
+          ],
+        ),
       ),
+
+      // // 하단 네비게이션 바
+      // bottomNavigationBar: BottomNavigationBar(
+      //   onTap: _onItemTapped, // 탭 변경 이벤트 처리
+      //   currentIndex: _selectedIndex, // 현재 선택된 탭 표시
+      //   items: <BottomNavigationBarItem>[
+      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+      //     BottomNavigationBarItem(icon: Icon(Icons.account_tree), label: '기기관리'),
+      //   ],
+      // ),
     );
   }
 

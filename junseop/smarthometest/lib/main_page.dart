@@ -26,8 +26,13 @@ class _MainPageState extends State<MainPage> {
       // appBar: AppBar(
       //   title: const Text('Main Page'),
       // ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
+
+
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(10, 10, 40, 10), // 모든 방향에 10씩 패딩 추가
+        child: _pages[_selectedIndex],
+      ),
+    bottomNavigationBar: BottomNavigationBar(
         onTap: _onItemTapped, // 탭 변경 이벤트 처리
         currentIndex: _selectedIndex, // 현재 선택된 탭 표시
         items: <BottomNavigationBarItem>[

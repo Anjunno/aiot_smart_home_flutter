@@ -10,18 +10,19 @@ class DayGraph extends StatefulWidget {
 }
 
 class _DayGraphState extends State<DayGraph> {
-  List<Map<String, dynamic>> _data = [];
+  List<Map<String, dynamic>> _data = []; // 전력량 데이터를 저장할 리스트
 
   @override
   void initState() {
     super.initState();
-    fetchDayData(); // 데이터를 초기화할 때 불러옴
+    fetchDayData(); // 위젯이 초기화될 때 데이터를 불러옴
   }
 
+  // API에서 데이터를 가져와 상태를 업데이트하는 비동기 함수
   Future<void> fetchDayData() async {
-    List<Map<String, dynamic>> data = await getDayEData();
+    List<Map<String, dynamic>> data = await getDayEData(); // API 호출
     setState(() {
-      _data = data; // 데이터를 받아와서 상태 업데이트
+      _data = data; // 가져온 데이터를 상태에 저장
     });
   }
 
@@ -31,34 +32,73 @@ class _DayGraphState extends State<DayGraph> {
         ? const Center(child: CircularProgressIndicator()) // 데이터가 없으면 로딩 표시
         : LineChart(
       LineChartData(
+        minX: 0, // X축 최소값 (첫 번째 데이터 인덱스)
+        maxX: _data.length.toDouble() - 1, // X축 최대값 (데이터 개수 - 1)
+        minY: 0, // Y축 최소값 (최소 전력량)
+        maxY: 4, // Y축 최대값 (최대 전력량)
+
+        // 그래프의 격자선 스타일 설정
+        gridData: FlGridData(
+          show: true, // 격자선 표시 여부
+          drawVerticalLine: false, // 세로선 미표시
+          drawHorizontalLine: true, // 가로선 표시
+          getDrawingHorizontalLine: (value) => FlLine(
+            strokeWidth: 1, // 선 두께 설정
+            color: Colors.grey.withOpacity(0.5), // 색상을 연한 회색으로 설정
+            dashArray: [5, 5], // 점선 설정 (5픽셀 선, 5픽셀 간격 반복)
+          ),
+        ),
+
+        // X, Y축 라벨 설정
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
-              showTitles: true, // X축 타이틀 표시
+              showTitles: true, // X축 라벨 표시 여부
+              interval: 1, // X축 값 간격을 1로 설정 (요일마다 하나씩 표시)
+              // reservedSize : 42,
               getTitlesWidget: (double value, TitleMeta meta) {
-                return Text(_data[value.toInt()]['date']); // X축에 날짜 표시
+                return Padding(padding: EdgeInsets.only(top: 5),
+                  child: Text(
+                    _data[value.toInt()]['date'], // X축에 날짜 표시
+                    style: TextStyle(fontSize: 10),),
+                );
+
               },
             ),
           ),
+
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
-              showTitles: true, // Y축 타이틀 표시
+              showTitles: true, // Y축 라벨 표시 여부
+              interval: 1, // Y축 값 간격 설정
+              reservedSize: 42, // 값들과 차트 사이의 공간
               getTitlesWidget: (value, meta) {
-                return Text('${value.toStringAsFixed(0)}Kwh'); // Y축 값 표시
+                return Text(
+                    '${value.toStringAsFixed(0)} KWh',
+                  style: TextStyle(fontSize: 12),
+                ); // Y축 값 표시
               },
             ),
           ),
+
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false), // 우측 Y축 숨김
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false), // 상단 X축 숨김
+          ),
         ),
-        minX: 0, // X축 최소값
-        maxX: _data.length.toDouble() - 1, // X축 최대값
-        minY: 0, // Y축 최소값
-        maxY: 4, // Y축 최대값
+
+        // 그래프의 데이터 설정
         lineBarsData: [
           LineChartBarData(
             spots: _data.asMap().entries.map((entry) {
-              return FlSpot(entry.key.toDouble(), entry.value['electricalEnergy'].toDouble()); // 데이터를 그래프에 표시
+              return FlSpot(
+                entry.key.toDouble(), // X축 값 (인덱스)
+                entry.value['electricalEnergy'].toDouble(), // Y축 값 (전력량)
+              );
             }).toList(),
-            isCurved: true, // 곡선으로 그래프 표시
+            isCurved: true, // 곡선 그래프 사용 여부
           ),
         ],
       ),

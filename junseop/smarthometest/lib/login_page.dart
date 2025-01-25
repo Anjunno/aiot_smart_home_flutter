@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarthometest/signUp_page.dart';
 import 'package:smarthometest/tab_page.dart';
+import 'package:smarthometest/toastMessage.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -19,7 +20,10 @@ class LoginPage extends StatelessWidget {
           ),
           ElevatedButton(
             // onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => TabPage()));},
-            onPressed: () {Navigator.pushNamedAndRemoveUntil(context, TabPage.routeName, (route) => false);},
+            onPressed: () {
+              Navigator.pushNamedAndRemoveUntil(context, TabPage.routeName, (route) => false);
+              showToast("로그인 완료");
+              },
             child: Title( color: Colors.amber, child: Text("Login")),
           ),
           ElevatedButton(

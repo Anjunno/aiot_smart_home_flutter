@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarthometest/root_page.dart';
 import 'package:smarthometest/tab_page.dart';
+import 'package:smarthometest/toastMessage.dart';
 
 class SignUpPage extends StatefulWidget {
 
@@ -25,7 +26,10 @@ class _SignUpPageState extends State<SignUpPage> {
             Text("This is the Siginup Page"),
             ElevatedButton(
               // onPressed: () {Navigator.pushNamed(context, TabPage.routeName);},
-              onPressed: () {Navigator.pushNamedAndRemoveUntil(context, TabPage.routeName, ModalRoute.withName(RootPage.routeName));},
+              onPressed: () {
+                Navigator.pushNamedAndRemoveUntil(context, TabPage.routeName, ModalRoute.withName(RootPage.routeName));
+                showToast("회원가입 완료");
+                },
               child: Title( color: Colors.amber, child: Text("SignUp")),
             ),
           ],
