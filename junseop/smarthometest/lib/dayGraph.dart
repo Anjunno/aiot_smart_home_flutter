@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:smarthometest/request.dart';
+import 'package:smarthometest/request/graph_request.dart';
 
 class DayGraph extends StatefulWidget {
   const DayGraph({super.key});
@@ -92,6 +92,7 @@ class _DayGraphState extends State<DayGraph> {
         // 그래프의 데이터 설정
         lineBarsData: [
           LineChartBarData(
+            color: Theme.of(context).colorScheme.primary,
             spots: _data.asMap().entries.map((entry) {
               return FlSpot(
                 entry.key.toDouble(), // X축 값 (인덱스)
@@ -99,6 +100,10 @@ class _DayGraphState extends State<DayGraph> {
               );
             }).toList(),
             isCurved: true, // 곡선 그래프 사용 여부
+            belowBarData: BarAreaData(
+              show: true, // 선 아래에 색상을 채움
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.2), // 채운 색상 설정
+            ),
           ),
         ],
       ),

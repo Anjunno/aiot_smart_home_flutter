@@ -30,6 +30,7 @@ class _TabPageState extends State<TabPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         automaticallyImplyLeading: false, // 기본 뒤로가기 버튼 비활성화
         title: const Text('SmartHome'),
 
@@ -90,11 +91,16 @@ class _TabPageState extends State<TabPage> {
             ),
             ListTile(
               title: const Text('로그아웃'),
-              onTap: () {
-                // 로그아웃 후 로그인 페이지로 이동
-                Navigator.pushNamedAndRemoveUntil(
-                    context, LoginPage.routeName, ModalRoute.withName(RootPage.routeName));
-                showToast("로그아웃");
+              onTap: () async {
+                try {
+                  // 비동기 화면 전환 처리
+                  await Navigator.pushNamedAndRemoveUntil(context, LoginPage.routeName, (route) => false);
+                  showToast("로그아웃");
+                } catch (e) {
+                  // 에러 처리
+                  print("로그인 화면 전환 중 오류 발생: $e");
+                  showToast("로그인 중 오류가 발생했습니다.");
+                }
               },
             ),
           ],
@@ -113,6 +119,7 @@ class _TabPageState extends State<TabPage> {
           ),
         ),
         child: BottomNavigationBar(
+          backgroundColor: Theme.of(context).colorScheme.secondary,//하단 네비게이션 바 색
           onTap: _onItemTapped, // 탭 변경 이벤트 처리
           currentIndex: _selectedIndex, // 현재 선택된 탭 표시
           items: const <BottomNavigationBarItem>[
