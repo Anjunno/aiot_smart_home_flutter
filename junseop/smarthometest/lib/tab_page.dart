@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smarthometest/login_page.dart';
 import 'package:smarthometest/myInfoPage.dart';
-import 'package:smarthometest/root_page.dart';
 import 'package:smarthometest/toastMessage.dart';
 
 import 'deviceManagement_page.dart';
@@ -28,41 +27,55 @@ class _TabPageState extends State<TabPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: colorScheme.secondary, // AppBar 배경색
         automaticallyImplyLeading: false, // 기본 뒤로가기 버튼 비활성화
-        title: const Text('SmartHome'),
+        centerTitle: true, // 타이틀을 중앙에 배치
+        title: Text('SmartHome', style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontWeight: FontWeight.bold)),
 
         // 햄버거 메뉴 버튼 (드로어 열기)
         leading: Builder(builder: (context) {
           return IconButton(
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              icon: Icon(Icons.menu));
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            icon: Icon(Icons.menu, color: colorScheme.onSecondary), // 아이콘 색을 onSecondary로 설정
+          );
         }),
 
         // 앱바 액션 버튼 (푸시 알림 토글 + 테마 변경)
         actions: [
+
+          //푸시알림 버튼
           IconButton(
             onPressed: () {//푸시알림 버튼 눌렀을 때
               setState(() {
                 _notificationsEnabled = !_notificationsEnabled; // 푸시 알림 ON/OFF 토글
-                _notificationsEnabled ? showToast("푸시알림 ON") :  showToast("푸시알림 OFF");
+                _notificationsEnabled
+                    ? showToast("푸시알림 ON")
+                    : showToast("푸시알림 OFF");
               });
-
             },
             icon: Icon(
               _notificationsEnabled ? Icons.notifications : Icons.notifications_off, // 아이콘 변경
+              color: colorScheme.onSecondary, // 아이콘 색을 onSecondary로 설정
             ),
           ),
+
+          //테마 변경 버튼
           IconButton(
-            onPressed: () { //테마 변경 버튼 눌렀을 때
-              MyApp.themeNotifier.value =
-              MyApp.themeNotifier.value == ThemeMode.light
-                  ? ThemeMode.dark
-                  : ThemeMode.light;
+            onPressed: () {
+              // 테마 변경 시 setState로 UI를 반영
+              setState(() {
+                MyApp.themeNotifier.value = MyApp.themeNotifier.value == ThemeMode.light
+                    ? ThemeMode.dark
+                    : ThemeMode.light;
+              });
+
+              // 테마 변경 후 토스트 메시지
               MyApp.themeNotifier.value == ThemeMode.light
                   ? showToast("Light mode")
                   : showToast("Dark mode");
@@ -71,6 +84,7 @@ class _TabPageState extends State<TabPage> {
               MyApp.themeNotifier.value == ThemeMode.light
                   ? Icons.dark_mode
                   : Icons.light_mode,
+              color: colorScheme.onSecondary, // 아이콘 색을 onSecondary로 설정
             ),
           )
         ],
@@ -82,7 +96,7 @@ class _TabPageState extends State<TabPage> {
           padding: EdgeInsets.zero, // 기본 패딩 제거
           children: [
             ListTile(
-              title: const Text('내정보'),
+              title: Text('내정보', style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),),
               onTap: () {
                 // '내정보' 선택 시 실행할 기능
                 Navigator.pop(context);
@@ -90,7 +104,7 @@ class _TabPageState extends State<TabPage> {
               },
             ),
             ListTile(
-              title: const Text('로그아웃'),
+              title: Text('로그아웃', style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),),
               onTap: () async {
                 try {
                   // 비동기 화면 전환 처리
@@ -115,29 +129,29 @@ class _TabPageState extends State<TabPage> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           border: Border(
-            top: BorderSide(color: Colors.grey, width: 1), // 상단 테두리 추가
+            top: BorderSide(color: colorScheme.surfaceContainerHighest, width: 1), // 상단 테두리 색을 surfaceContainerHighest로 설정
           ),
         ),
         child: BottomNavigationBar(
-          backgroundColor: Theme.of(context).colorScheme.secondary,//하단 네비게이션 바 색
+          selectedLabelStyle: TextStyle(fontSize: 16), // 선택된 레이블 색상
+          selectedItemColor: colorScheme.onPrimary, // 선택된 아이콘 색상
+          unselectedItemColor: colorScheme.onSurface, // 선택되지 않은 아이콘 색상
+          backgroundColor: colorScheme.secondary, // 하단 네비게이션 바 배경색
           onTap: _onItemTapped, // 탭 변경 이벤트 처리
           currentIndex: _selectedIndex, // 현재 선택된 탭 표시
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.account_tree), label: '기기관리'),
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_tree),
+              label: '기기관리',
+            ),
           ],
-        ),
-      ),
+        )
 
-      // // 하단 네비게이션 바
-      // bottomNavigationBar: BottomNavigationBar(
-      //   onTap: _onItemTapped, // 탭 변경 이벤트 처리
-      //   currentIndex: _selectedIndex, // 현재 선택된 탭 표시
-      //   items: <BottomNavigationBarItem>[
-      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-      //     BottomNavigationBarItem(icon: Icon(Icons.account_tree), label: '기기관리'),
-      //   ],
-      // ),
+      ),
     );
   }
 

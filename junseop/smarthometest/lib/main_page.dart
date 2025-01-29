@@ -33,9 +33,10 @@ class _MainPageState extends State<MainPage> {
         child: _pages[_selectedIndex],
       ),
     bottomNavigationBar: BottomNavigationBar(
-        onTap: _onItemTapped, // 탭 변경 이벤트 처리
-        currentIndex: _selectedIndex, // 현재 선택된 탭 표시
-        items: <BottomNavigationBarItem>[
+      selectedLabelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      onTap: _onItemTapped, // 탭 변경 이벤트 처리
+      currentIndex: _selectedIndex, // 현재 선택된 탭 표시
+      items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.electric_bolt), label: '기기'),
           BottomNavigationBarItem(icon: Icon(Icons.account_tree), label: '일별'),
           BottomNavigationBarItem(icon: Icon(Icons.ac_unit), label: '월별'),
