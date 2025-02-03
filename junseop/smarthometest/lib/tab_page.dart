@@ -95,7 +95,15 @@ class _TabPageState extends State<TabPage> {
         child: ListView(
           padding: EdgeInsets.zero, // 기본 패딩 제거
           children: [
+            UserAccountsDrawerHeader(
+              accountName: Text("내 이름"),
+              accountEmail: Text("myEmail@naver.com"),
+              currentAccountPicture: CircleAvatar(
+                backgroundImage: AssetImage('assets/good.png'),
+              ),
+            ),
             ListTile(
+              leading: Icon(Icons.account_circle_rounded, color: colorScheme.onSurface,),
               title: Text('내정보', style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),),
               onTap: () {
                 // '내정보' 선택 시 실행할 기능
@@ -104,6 +112,7 @@ class _TabPageState extends State<TabPage> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.logout, color: colorScheme.onSurface,),
               title: Text('로그아웃', style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),),
               onTap: () async {
                 try {

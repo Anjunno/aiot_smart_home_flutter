@@ -37,6 +37,32 @@ class _DayGraphState extends State<DayGraph> {
         minY: 0, // Y축 최소값 (최소 전력량)
         maxY: 4, // Y축 최대값 (최대 전력량)
 
+        // 그래프 터치 시 툴팁(숫자) 스타일 설정
+        lineTouchData: LineTouchData(
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipColor: (touchedSpot) {
+              return Theme.of(context).colorScheme.secondary;
+            },
+            // : Colors.black.withOpacity(0.8), // 툴팁 배경색 변경
+            // tooltipBorder: BorderSide(color: Colors.white, width: 1), // 툴팁 테두리 추가
+            fitInsideHorizontally: true, // 툴팁이 그래프 밖으로 나가지 않도록 설정
+            fitInsideVertically: true,
+            tooltipRoundedRadius: 8, // 툴팁 모서리 둥글게 설정
+            getTooltipItems: (List<LineBarSpot> touchedSpots) {
+              return touchedSpots.map((spot) {
+                return LineTooltipItem(
+                  '${spot.y.toStringAsFixed(1)} KWh', // 툴팁에 표시할 텍스트
+                  TextStyle(
+                    color: Theme.of(context).colorScheme.surface, // 숫자 색상 변경
+                    fontSize: 14, // 숫자 크기 변경
+                    fontWeight: FontWeight.bold, // 숫자 굵기 변경
+                  ),
+                );
+              }).toList();
+            },
+          ),
+        ),
+
         // 그래프의 격자선 스타일 설정
         gridData: FlGridData(
           show: true, // 격자선 표시 여부
@@ -55,14 +81,14 @@ class _DayGraphState extends State<DayGraph> {
             sideTitles: SideTitles(
               showTitles: true, // X축 라벨 표시 여부
               interval: 1, // X축 값 간격을 1로 설정 (요일마다 하나씩 표시)
-              // reservedSize : 42,
               getTitlesWidget: (double value, TitleMeta meta) {
-                return Padding(padding: EdgeInsets.only(top: 5),
+                return Padding(
+                  padding: EdgeInsets.only(top: 5),
                   child: Text(
                     _data[value.toInt()]['date'], // X축에 날짜 표시
-                    style: TextStyle(fontSize: 10),),
+                    style: TextStyle(fontSize: 10),
+                  ),
                 );
-
               },
             ),
           ),
@@ -74,7 +100,7 @@ class _DayGraphState extends State<DayGraph> {
               reservedSize: 42, // 값들과 차트 사이의 공간
               getTitlesWidget: (value, meta) {
                 return Text(
-                    '${value.toStringAsFixed(0)} KWh',
+                  '${value.toStringAsFixed(0)} KWh',
                   style: TextStyle(fontSize: 12),
                 ); // Y축 값 표시
               },
