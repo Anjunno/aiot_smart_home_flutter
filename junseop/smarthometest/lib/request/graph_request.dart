@@ -155,6 +155,20 @@ List<Map<String, dynamic>> getDeviceList() {
     {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
     {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
     {"deviceName": "조명", "modelName": "AeroFlex-G1"},
+    {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"},
+
+    {"deviceName": "TV", "modelName": "SmartSense-3000"},
+    {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
+    {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
+    {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
+    {"deviceName": "조명", "modelName": "AeroFlex-G1"},
+    {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"},
+
+    {"deviceName": "TV", "modelName": "SmartSense-3000"},
+    {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
+    {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
+    {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
+    {"deviceName": "조명", "modelName": "AeroFlex-G1"},
     {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"}
   ];
   List<Map<String, dynamic>> deviceList = data.map((item) {

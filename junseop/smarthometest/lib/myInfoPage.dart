@@ -39,7 +39,7 @@ class MyInfoPage extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.arrow_back),
+                              Icon(Icons.arrow_back_ios),
                               Text(
                                 '뒤로가기',
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

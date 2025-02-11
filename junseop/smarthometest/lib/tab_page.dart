@@ -3,9 +3,10 @@ import 'package:smarthometest/login_page.dart';
 import 'package:smarthometest/myInfoPage.dart';
 import 'package:smarthometest/toastMessage.dart';
 
-import 'deviceManagement_page.dart';
+import 'deviceManagement/deviceManagementMain_page.dart';
+import 'deviceManagement/deviceManagement_page.dart';
 import 'main.dart';
-import 'main_page.dart';
+import 'home/main_page.dart';
 
 class TabPage extends StatefulWidget {
   const TabPage({super.key});
@@ -22,7 +23,7 @@ class _TabPageState extends State<TabPage> {
   // 각 탭에서 보여줄 페이지 목록
   List _pages = [
     MainPage(), // 홈 화면
-    DevicemanagementPage(), // 기기 관리 화면
+    DevicemanagementmainPage(), // 기기 관리 화면
   ];
 
   @override
@@ -154,7 +155,7 @@ class _TabPageState extends State<TabPage> {
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_tree),
+              icon: Icon(Icons.electrical_services),
               label: '기기관리',
             ),
           ],

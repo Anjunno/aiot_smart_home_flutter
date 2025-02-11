@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:smarthometest/deviceManagement_page.dart';
+import 'package:smarthometest/deviceManagement/deviceManagement_page.dart';
 import 'package:smarthometest/login_page.dart';
 import 'package:smarthometest/myInfoPage.dart';
 import 'package:smarthometest/root_page.dart';
 import 'package:smarthometest/signUp_page.dart';
 import 'package:smarthometest/tab_page.dart';
+
+import 'deviceManagement/groupDeviceManagement_page.dart';
 // Navigator.of(context).popUntil((route) => route.isFirst); 위젯트리 확인해보기
 void main() {
   runApp(const MyApp());
@@ -37,6 +39,7 @@ class MyApp extends StatelessWidget {
             TabPage.routeName: (context) => TabPage(),
             SignUpPage.routeName: (context) => SignUpPage(),
             DevicemanagementPage.routeName: (context) => DevicemanagementPage(),
+            GroupDevicemanagementPage.routeName: (context) => GroupDevicemanagementPage(),
             MyInfoPage.routeName: (context) => MyInfoPage(),
           },
         );

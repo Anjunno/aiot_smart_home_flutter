@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smarthometest/dayGraph.dart';
-import 'package:smarthometest/monthGraph.dart';
+import 'package:smarthometest/home/dayGraph.dart';
+import 'package:smarthometest/home/monthGraph.dart';
 
 import 'deviceGraph.dart';
 class MainPage extends StatefulWidget {
@@ -37,9 +37,9 @@ class _MainPageState extends State<MainPage> {
       onTap: _onItemTapped, // 탭 변경 이벤트 처리
       currentIndex: _selectedIndex, // 현재 선택된 탭 표시
       items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.electric_bolt), label: '기기'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_tree), label: '일별'),
-          BottomNavigationBarItem(icon: Icon(Icons.ac_unit), label: '월별'),
+          BottomNavigationBarItem(icon: Icon(Icons.devices), label: '기기'),
+          BottomNavigationBarItem(icon: Icon(Icons.schedule), label: '일별'),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: '월별'),
         ],
       ),
     );
