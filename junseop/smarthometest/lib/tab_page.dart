@@ -101,6 +101,7 @@ class _TabPageState extends State<TabPage> {
               accountEmail: Text("myEmail@naver.com"),
               currentAccountPicture: CircleAvatar(
                 backgroundImage: AssetImage('assets/good.png'),
+                backgroundColor: colorScheme.onSecondary,
               ),
             ),
             ListTile(

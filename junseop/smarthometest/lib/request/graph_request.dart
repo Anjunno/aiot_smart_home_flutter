@@ -1,4 +1,41 @@
 
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+// Future<Map<String, dynamic>?> onOff(String deviceName, String onOff) async {
+Future<bool> onOffDevice(String deviceId, String onOff) async {
+  final url = dotenv.get("URL");
+  final dio = Dio();
+  Map<String, dynamic> data = {
+    "action": onOff
+  };
+
+  try {
+    final response = await dio.post(url + "/control/device/" + deviceId, data: data);
+
+    if (response.statusCode == 200) {
+      final responseData = response.data;
+      if (responseData != null && responseData['status'] == 'success') {
+        print("기기 ${onOff == 'on' ? '켜짐' : '꺼짐'}: $deviceId");
+        return true; // 성공 시 true 반환
+      } else {
+        print("기기 상태 변경 실패: ${responseData['message']}");
+        return false; // 실패 시 false 반환
+      }
+    } else {
+      print("요청 실패: ${response.statusCode}");
+      return false; // 실패 시 false 반환
+    }
+  } catch (e) {
+    print("에러 발생: $e");
+    return false; // 에러 발생 시 false 반환
+  }
+}
+
+
 // List<Map<String, dynamic>> getDayData(BuildContext context)
 List<Map<String, dynamic>> getDeviceEData() {
   // List<dynamic> data = response.data;
@@ -148,34 +185,59 @@ List<Map<String, dynamic>> getMonthEData() {
   return monthList;
 }
 
-List<Map<String, dynamic>> getDeviceList() {
-  List<dynamic> data = [
-    {"deviceName": "TV", "modelName": "SmartSense-3000"},
-    {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
-    {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
-    {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
-    {"deviceName": "조명", "modelName": "AeroFlex-G1"},
-    {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"},
+Future<List<Map<String, dynamic>>> getDeviceList() async {
+  final url = dotenv.get("URL");
+  print(url);
+  final storage = new FlutterSecureStorage();
+  final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+  final dio = Dio();
 
-    {"deviceName": "TV", "modelName": "SmartSense-3000"},
-    {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
-    {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
-    {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
-    {"deviceName": "조명", "modelName": "AeroFlex-G1"},
-    {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"},
+  final response = await dio.get(url + "/check/plugList");
 
-    {"deviceName": "TV", "modelName": "SmartSense-3000"},
-    {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
-    {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
-    {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
-    {"deviceName": "조명", "modelName": "AeroFlex-G1"},
-    {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"}
-  ];
-  List<Map<String, dynamic>> deviceList = data.map((item) {
-    return {
-      "deviceName": item['deviceName'],
-      "modelName": item['modelName']
-    };
-  }).toList();
-  return deviceList;
+  if (response.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response.data);
+    List<Map<String, dynamic>> deviceList = data.map((item) {
+      return {
+        "curVoltage": item['curVoltage'], //raw 전력 V
+        "curPower": item['curPower'], //raw 전력 W
+        "curCurrent": item['curCurrent'], //현재 전류 mA
+        "name": item['name'], //플러그 명
+        "online": item['online'], //온라인 여부(네트워크 연결 여부)
+        "id": item['id'], //기기 고유 기기값
+        "power": item['power'], //전원 on / off 여부
+      };
+    }).toList();
+    return deviceList;
+  } else {
+    return [];
+  }
+  // List<dynamic> data = [
+  //   {"deviceName": "TV", "modelName": "SmartSense-3000"},
+  //   {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
+  //   {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
+  //   {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
+  //   {"deviceName": "조명", "modelName": "AeroFlex-G1"},
+  //   {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"},
+  //
+  //   {"deviceName": "TV", "modelName": "SmartSense-3000"},
+  //   {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
+  //   {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
+  //   {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
+  //   {"deviceName": "조명", "modelName": "AeroFlex-G1"},
+  //   {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"},
+  //
+  //   {"deviceName": "TV", "modelName": "SmartSense-3000"},
+  //   {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
+  //   {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
+  //   {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
+  //   {"deviceName": "조명", "modelName": "AeroFlex-G1"},
+  //   {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"}
+  // ];
+  // List<Map<String, dynamic>> deviceList = data.map((item) {
+  //   return {
+  //     "deviceName": item['deviceName'],
+  //     "modelName": item['modelName']
+  //   };
+  // }).toList();
+  // return deviceList;
 }

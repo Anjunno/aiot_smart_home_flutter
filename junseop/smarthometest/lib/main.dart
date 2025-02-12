@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smarthometest/deviceManagement/deviceManagement_page.dart';
 import 'package:smarthometest/login_page.dart';
 import 'package:smarthometest/myInfoPage.dart';
@@ -8,7 +9,8 @@ import 'package:smarthometest/tab_page.dart';
 
 import 'deviceManagement/groupDeviceManagement_page.dart';
 // Navigator.of(context).popUntil((route) => route.isFirst); 위젯트리 확인해보기
-void main() {
+Future<void> main() async {
+  await dotenv.load();
   runApp(const MyApp());
 }
 

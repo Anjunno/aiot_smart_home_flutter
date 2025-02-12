@@ -22,8 +22,8 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
 
   // 기기 목록을 새로 고치는 함수
   Future<void> _loadDevices() async {
+     _devices = await getDeviceList(); // 기기 목록을 다시 가져오는 함수 호출
     setState(() {
-      _devices = getDeviceList(); // 기기 목록을 다시 가져오는 함수 호출
     });
   }
 
@@ -57,8 +57,8 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                         itemCount: _devices.length, // 기기 목록의 개수만큼 리스트 항목을 생성
                         itemBuilder: (context, index) {
                           return CheckboxListTile(
-                            title: Text(_devices[index]['deviceName']), // 기기 이름 표시
-                            subtitle: Text(_devices[index]['modelName']), // 기기 모델명 표시
+                            title: Text(_devices[index]['name']), // 기기 이름 표시
+                            subtitle: Text(_devices[index]['id']), // 기기 모델명 표시
                             value: selected[index], // 해당 기기의 선택 상태
                             onChanged: (bool? value) {
                               setState(() {
