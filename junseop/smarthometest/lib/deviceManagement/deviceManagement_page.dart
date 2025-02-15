@@ -87,41 +87,43 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
               itemCount: _devices.length,
               itemBuilder: (context, index) {
                 final device = _devices[index];
-                return ListTile(
-                  leading: const Icon(Icons.devices), // 기기 아이콘
-                  title: Text(device['name']), // 기기 이름
-                  subtitle: Text('기기 ID: ${device['id']}'), // 기기 ID
-                  trailing: Switch(
-                    value: _deviceStates[index],
-                    onChanged: (value) => _toggleDeviceState(index, value),
-                  ),
-                  onTap: () {
-                    // 기기 상세 정보 팝업
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text(device['name']),
-                          content: Text(
-                            '기기 ID: ${device['id']}\n'
-                                '현재 전압: ${device['curVoltage']}V\n'
-                                '현재 전력: ${device['curPower']}W\n'
-                                '현재 전류: ${device['curCurrent']}mA\n'
-                                '온라인 상태: ${device['online'] ? '온라인' : '오프라인'}\n'
-                                '전원 상태: ${_deviceStates[index] ? '켜짐' : '꺼짐'}',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('확인'),
+                return Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.devices), // 기기 아이콘
+                    title: Text(device['name']), // 기기 이름
+                    subtitle: Text('기기 ID: ${device['id']}'), // 기기 ID
+                    trailing: Switch(
+                      value: _deviceStates[index],
+                      onChanged: (value) => _toggleDeviceState(index, value),
+                    ),
+                    onTap: () {
+                      // 기기 상세 정보 팝업
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text(device['name']),
+                            content: Text(
+                              '기기 ID: ${device['id']}\n'
+                                  '현재 전압: ${device['curVoltage']}V\n'
+                                  '현재 전력: ${device['curPower']}W\n'
+                                  '현재 전류: ${device['curCurrent']}mA\n'
+                                  '온라인 상태: ${device['online'] ? '온라인' : '오프라인'}\n'
+                                  '전원 상태: ${_deviceStates[index] ? '켜짐' : '꺼짐'}',
                             ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('확인'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             );

@@ -5,6 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+
+///기기 on/off
 // Future<Map<String, dynamic>?> onOff(String deviceName, String onOff) async {
 Future<bool> onOffDevice(String deviceId, String onOff) async {
   final url = dotenv.get("URL");
@@ -35,6 +37,46 @@ Future<bool> onOffDevice(String deviceId, String onOff) async {
   }
 }
 
+///그룹 리스트 요청
+Future<List<Map<String, dynamic>>> getGroupList() async {
+  final url = dotenv.get("URL");
+  final storage = FlutterSecureStorage();
+  final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+  final dio = Dio();
+  final response = await dio.get(url + "/group/check/list");
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = response.data as List<dynamic>;
+    List<Map<String, dynamic>> groupList = data.map((item) {
+      return {
+        "groupId": item['groupId'],
+        "groupName": item['groupName'],
+        "creationTime": item['creationTime'],
+      };
+    }).toList();
+
+    print("GroupList: $groupList");
+    return groupList;
+  } else {
+    return [];
+  }
+}
+
+Future<void> createGroup(String groupName) async {
+  final url = dotenv.get("URL");
+  final storage = FlutterSecureStorage();
+  final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+  final dio = Dio();
+  Map<String, dynamic> data = {
+    "groupName": groupName
+  };
+  final response = await dio.post(url + "/group/create", data: data);
+  if (response.statusCode == 200) {
+    print("그룹 생성 성공: $groupName");
+  } else {
+    print("그룹 생성 실패: ${response.statusCode}");
+  }
+}
 
 // List<Map<String, dynamic>> getDayData(BuildContext context)
 List<Map<String, dynamic>> getDeviceEData() {
@@ -185,6 +227,8 @@ List<Map<String, dynamic>> getMonthEData() {
   return monthList;
 }
 
+
+///기기 리스트 요청
 Future<List<Map<String, dynamic>>> getDeviceList() async {
   final url = dotenv.get("URL");
   print(url);
@@ -211,33 +255,4 @@ Future<List<Map<String, dynamic>>> getDeviceList() async {
   } else {
     return [];
   }
-  // List<dynamic> data = [
-  //   {"deviceName": "TV", "modelName": "SmartSense-3000"},
-  //   {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
-  //   {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
-  //   {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
-  //   {"deviceName": "조명", "modelName": "AeroFlex-G1"},
-  //   {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"},
-  //
-  //   {"deviceName": "TV", "modelName": "SmartSense-3000"},
-  //   {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
-  //   {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
-  //   {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
-  //   {"deviceName": "조명", "modelName": "AeroFlex-G1"},
-  //   {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"},
-  //
-  //   {"deviceName": "TV", "modelName": "SmartSense-3000"},
-  //   {"deviceName": "냉장고", "modelName": "EcoBuddy-Pro"},
-  //   {"deviceName": "에어컨", "modelName": "VisionAI-V10"},
-  //   {"deviceName": "세탁기", "modelName": "QuantumEdge-X2"},
-  //   {"deviceName": "조명", "modelName": "AeroFlex-G1"},
-  //   {"deviceName": "컴퓨터", "modelName": "SmartCore-AI8"}
-  // ];
-  // List<Map<String, dynamic>> deviceList = data.map((item) {
-  //   return {
-  //     "deviceName": item['deviceName'],
-  //     "modelName": item['modelName']
-  //   };
-  // }).toList();
-  // return deviceList;
 }
