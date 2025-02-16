@@ -78,6 +78,19 @@ Future<void> createGroup(String groupName) async {
   }
 }
 
+Future<void> groupAction(Map<String, dynamic> groupData) async {
+  final url = dotenv.get("URL");
+  final storage = FlutterSecureStorage();
+  final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+  final dio = Dio();
+  final response = await dio.post(url + "/group/action/add", data: groupData);
+  if (response.statusCode == 200) {
+    print("그룹 액션 추가 성공: $groupData");
+  } else {
+    print("그룹 액션 추가 실패: ${response.statusCode}");
+  }
+}
+
 // List<Map<String, dynamic>> getDayData(BuildContext context)
 List<Map<String, dynamic>> getDeviceEData() {
   // List<dynamic> data = response.data;

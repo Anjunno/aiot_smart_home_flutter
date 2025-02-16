@@ -44,8 +44,55 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
     });
   }
 
+  //⭐ 그룹 이름 추가 ⭐
+  void _createGroupName() async {
+    TextEditingController groupNameController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("그룹 이름 추가"),
+          content: TextField(
+            controller: groupNameController,
+            decoration: const InputDecoration(labelText: "그룹 이름"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+              },
+              child: const Text("취소"),
+            ),
+            TextButton(
+              onPressed: () async {
+
+                String groupName = groupNameController.text.trim();
+
+                if (groupName.isEmpty) {
+                  // 그룹명이 비어있을 경우 경고 메시지
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('그룹명을 입력하세요.')),
+                  );
+                  return;
+                }
+                print("그룹이름 요청할게");
+                await createGroup(groupName);
+                Navigator.pop(context);
+              },
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // ⭐ 그룹 추가 Dialog ⭐
-  void _showAddGroupDialog() async {
+  void _showAddGroupDialog(groupId) async {
+
+    Map<String, dynamic> groupData;
+
     setState(() {
       isLoading = true; // 로딩 상태 활성화
     });
@@ -60,12 +107,12 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
     // Dialog에서 사용할 TextEditingController 및 상태 변수
     TextEditingController groupNameController = TextEditingController();
     Map<String, bool> deviceSelection = {};  // 기기 선택 상태 저장
-    Map<String, bool> deviceState = {};      // 사용자가 선택한 on/off 상태 저장
+    Map<String, String> deviceState = {};      // 사용자가 선택한 on/off 상태 저장
 
     // 기기 목록 초기화 (초기 상태는 모두 off)
     for (var device in _devices) {
       deviceSelection[device['id']] = false;
-      deviceState[device['id']] = false;
+      deviceState[device['id']] = "off";
     }
 
     // ⭐ 그룹 추가 Dialog UI ⭐
@@ -79,15 +126,15 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
               content: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // 그룹명 입력 필드
-                    TextField(
-                      controller: groupNameController,
-                      decoration: const InputDecoration(labelText: "그룹명"),
-                    ),
                     const SizedBox(height: 20),
 
                     // 기기 목록 출력 및 선택
                     Column(
+                      // 그룹명 입력 필드
+                      // TextField(
+                      //   controller: groupNameController,
+                      //   decoration: const InputDecoration(labelText: "그룹명"),
+                      // ),
                       children: _devices.map((device) {
                         return CheckboxListTile(
                           title: Text(device['name']),
@@ -100,11 +147,11 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                           },
                           // 기기 on/off 스위치
                           secondary: Switch(
-                            value: deviceState[device['id']]!,
+                            value: deviceState[device['id']] == "on",
                             onChanged: deviceSelection[device['id']]!
                                 ? (bool value) {
                               setState(() {
-                                deviceState[device['id']] = value;
+                                deviceState[device['id']] = value ? "on" : "off";
                               });
                             }
                                 : null, // 체크 안된 기기는 비활성화
@@ -124,34 +171,37 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                 // 확인 버튼
                 ElevatedButton(
                   onPressed: () async {
-                    String groupName = groupNameController.text;
-                    if (groupName.isEmpty) {
-                      // 그룹명이 비어있을 경우 경고 메시지
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('그룹명을 입력하세요.')),
-                      );
-                      return;
-                    }
-
+                    // String groupName = groupNameController.text;
+                    // if (groupName.isEmpty) {
+                    //   // 그룹명이 비어있을 경우 경고 메시지
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(content: Text('그룹명을 입력하세요.')),
+                    //   );
+                    //   return;
+                    // }
                     // 선택된 기기 목록 저장
                     List<Map<String, dynamic>> selectedDevices = _devices
                         .where((device) => deviceSelection[device['id']] == true)
                         .map((device) => {
-                      "id": device['id'],
-                      "power": deviceState[device['id']]
+                      "plugId": device['id'],
+                      "action": deviceState[device['id']]
                     })
                         .toList();
+                    print(selectedDevices);
 
-                    await createGroup(groupName);
+                    groupData =
+                    {
+                      "groupId": groupId,
+                      "devices": selectedDevices,
+                    };
 
-                    // 새로운 그룹 추가
                     setState(() {
-                      // _groups.add({
-                      //   "groupName": groupName,
-                      //   "devices": selectedDevices,
-                      // });
-                      print(_groups);  // 디버깅용 출력
+                      print(groupData); // 디버깅용 출력
                     });
+
+                    await groupAction(groupData);
+
+
 
                     Navigator.pop(context);
                   },
@@ -163,6 +213,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
         );
       },
     );
+
   }
 
   // ⭐ 그룹 전체 상태 변경 ⭐
@@ -184,7 +235,8 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
           // 그룹 추가 버튼
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: _showAddGroupDialog, // 그룹 추가 Dialog 호출
+            // onPressed: _showAddGroupDialog, // 그룹 추가 Dialog 호출
+            onPressed: _createGroupName,
           ),
         ],
       ),
@@ -206,10 +258,23 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
             margin: const EdgeInsets.all(10),
             child: ListTile(
               title: Text(group['groupName']),
-              // 그룹 상태 on/off 스위치
-              trailing: Switch(
-                value: groupState,
-                onChanged: (value) => _toggleGroupState(index, value),
+              // 수정 버튼 추가
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 수정 아이콘 버튼
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      _showAddGroupDialog(_groups[index]["groupId"]);
+                    },
+                  ),
+                  // 그룹 상태 on/off 스위치
+                  // Switch(
+                  //   value: ,
+                  //   onChanged: (value) => _toggleGroupState(index, value),
+                  // ),
+                ],
               ),
             ),
           );
