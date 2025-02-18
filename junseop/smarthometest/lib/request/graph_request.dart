@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -61,7 +62,7 @@ Future<List<Map<String, dynamic>>> getGroupList() async {
     return [];
   }
 }
-
+//그룹 이름 생성
 Future<void> createGroup(String groupName) async {
   final url = dotenv.get("URL");
   final storage = FlutterSecureStorage();
@@ -78,6 +79,7 @@ Future<void> createGroup(String groupName) async {
   }
 }
 
+//그룹 액션 설정
 Future<void> groupAction(Map<String, dynamic> groupData) async {
   final url = dotenv.get("URL");
   final storage = FlutterSecureStorage();
@@ -90,6 +92,61 @@ Future<void> groupAction(Map<String, dynamic> groupData) async {
     print("그룹 액션 추가 실패: ${response.statusCode}");
   }
 }
+
+//그룹 액션 확인
+Future<List<Map<String, dynamic>>> groupActionCheck(groupId) async {
+  final url = dotenv.get("URL");
+  final storage = FlutterSecureStorage();
+  final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+  final dio = Dio();
+
+  try {
+    // groupId가 int 타입일 경우 toString()으로 변환
+    final response = await dio.get(url + "/group/action/check/" + groupId.toString());
+
+    if (response.statusCode == 200) {
+      // JSON 데이터를 List<dynamic>으로 변환
+      List<dynamic> data = jsonDecode(response.data);
+
+      // Map으로 변환
+      List<Map<String, dynamic>> groupAction = data.map((item) {
+        return {
+          "groupId": item['groupId'],
+          "plugId": item['plugId'],
+          "plugControl": item['plugControl'],
+        };
+      }).toList();
+
+      print("groupAction 내용:\n$groupAction");
+      return groupAction;
+    } else {
+      print("응답 오류: ${response.statusCode}");
+      return [];
+    }
+  } catch (e) {
+    print("예외 발생: $e");
+    return [];
+  }
+}
+
+//그룹 액션 실행
+Future<void> groupActionRun(groupId) async {
+  final url = dotenv.get("URL");
+  final storage = FlutterSecureStorage();
+  final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+  final dio = Dio();
+
+  final response = await dio.get(url + "/group/action/run/" + groupId.toString());
+  if (response.statusCode == 200) {
+    print(response);
+  } else {
+    print(response);
+    print("그룹 액션 실패: ${response.statusCode}");
+  }
+}
+
+
+
 
 // List<Map<String, dynamic>> getDayData(BuildContext context)
 List<Map<String, dynamic>> getDeviceEData() {
