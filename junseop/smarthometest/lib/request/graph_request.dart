@@ -69,7 +69,7 @@ Future<void> createGroup(String groupName) async {
   final accessToken = await storage.read(key: 'ACCESS_TOKEN');
   final dio = Dio();
   Map<String, dynamic> data = {
-    "groupName": groupName
+    "groupName": groupName + " 그룹"
   };
   final response = await dio.post(url + "/group/create", data: data);
   if (response.statusCode == 200) {

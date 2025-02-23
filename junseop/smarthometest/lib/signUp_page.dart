@@ -74,8 +74,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             return null;
                           },
                           decoration: const InputDecoration(
-                            labelText: 'Email',
-                            hintText: '이메일을 입력해주세요.',
+                            labelText: 'Id',
+                            hintText: '아이디를 입력해주세요.',
                             prefixIcon: Icon(Icons.email_outlined), // 이메일 아이콘
                             border: OutlineInputBorder(),
                           ),
