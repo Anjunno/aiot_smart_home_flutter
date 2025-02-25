@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:smarthometest/request/graph_request.dart';
+import 'package:smarthometest/toastMessage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 class GroupDevicemanagementPage extends StatefulWidget {
   static String routeName = "/GroupManagementPage";
@@ -71,9 +74,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                 String groupName = groupNameController.text.trim();
 
                 if (groupName.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('그룹명을 입력하세요.')),
-                  );
+                  showToast("그룹명을 입력하세요.");
                   return;
                 }
 
@@ -233,105 +234,169 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("그룹 관리"),
-        toolbarHeight: 35.0, // AppBar 높이 조정
+        toolbarHeight: 35.0,
         actions: [
-          // 그룹 추가 버튼
           IconButton(
             icon: const Icon(Icons.add),
-            // onPressed: _showAddGroupDialog, // 그룹 추가 Dialog 호출
             onPressed: _createGroupName,
           ),
         ],
       ),
-      body: isLoading
-          // 🔄 로딩 상태일 때: 로딩 화면 표시
-          ? const Center(child: CircularProgressIndicator())
-          // ❌ 그룹이 없을 때: 안내 문구 출력
-          : _groups.isEmpty
-              ? const Center(child: Text('등록된 그룹이 없습니다.'))
-              // ✅ 그룹 목록 출력
-              : ListView.builder(
-                  itemCount: _groups.length,
-                  itemBuilder: (context, index) {
-                    final group = _groups[index];
-                    // 그룹 내 모든 기기의 상태가 true일 때 그룹 상태도 true
-                    bool groupState = (group['devices'] ?? [])
-                        .every((device) => device['power'] == true);
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _loadGroups();
+          await _loadDevices();
+        },
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _groups.isEmpty
+            ? const Center(child: Text('등록된 그룹이 없습니다.'))
+            : ListView.builder(
+          itemCount: _groups.length,
+          itemBuilder: (context, index) {
+            final group = _groups[index];
+            bool groupState = (group['devices'] ?? [])
+                .every((device) => device['power'] == true);
 
-                    return Card(
-                      margin: const EdgeInsets.all(5),
-                      child: ListTile(
-                        title: Text(group['groupName']),
-                        // 수정 버튼 추가
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
+            return Card(
+              margin: const EdgeInsets.all(5),
+              child: ListTile(
+                title: Text(group['groupName']),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        _showAddGroupDialog(
+                            _groups[index]["groupId"].toString());
+                      },
+                    ),
+                    IconButton(
+                        onPressed: () {}, icon: const Icon(Icons.delete)),
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .onInverseSurface,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4)),
+                        ),
+                        onPressed: () {
+                          groupActionRun(_groups[index]["groupId"]);
+                        },
+                        child: Text("실행")),
+                  ],
+                ),
+                onTap: () async {
+                  // groupActionCheck 결과 받아오기
+                  List<Map<String, dynamic>> groupAction = await groupActionCheck(_groups[index]["groupId"]);
+
+                  // 다이얼로그 표시
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: Row(
                           children: [
-                            // 수정 아이콘 버튼
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                _showAddGroupDialog(_groups[index]["groupId"].toString());
-                              },
+                            Icon(Icons.devices, color: Colors.blue),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                "${group["groupName"]} 설정 상태",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
-                            IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.delete)),
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .onInverseSurface,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4)),
-                                ),
-                                onPressed: () {groupActionRun(_groups[index]["groupId"]);},
-                                child: Text("실행")),
-                            // 그룹 상태 on/off 스위치
-                            // Switch(
-                            //   value: ,
-                            //   onChanged: (value) => _toggleGroupState(index, value),
-                            // ),
                           ],
                         ),
-                        //리스트 타일을 클릭했을 때
-                        onTap: () async {
-                          // 데이터를 가져옴
-                          List<Map<String, dynamic>> groupAction = await groupActionCheck(_groups[index]["groupId"]);
+                        content: SingleChildScrollView( // 스크롤 가능하게 감싸기
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8, // 다이얼로그 크기 조절
+                            child: groupAction.isNotEmpty
+                                ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: groupAction.map((group) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 8),
+                                    group["plug"].isNotEmpty
+                                        ? Column(
+                                      children: (group["plug"] as List).map((plug) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(bottom: 8.0),
+                                          child: Card(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            elevation: 4,
+                                            child: ListTile(
+                                              leading: Icon(Icons.power, color: Colors.orange),
+                                              title: Text('${plug["plugName"]}',
+                                                  style: TextStyle(fontWeight: FontWeight.bold)),
+                                              subtitle: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('Plug ID: ${plug["plugId"]}'),
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        "동작 설정",
+                                                        style: TextStyle(
+                                                          color: plug["plugControl"] == "on"
+                                                              ? Colors.green
+                                                              : Colors.red,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Icon(
+                                                        plug["plugControl"] == "on"
+                                                            ? Icons.toggle_on
+                                                            : Icons.toggle_off,
+                                                        color: plug["plugControl"] == "on"
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    )
+                                        : const Text('등록된 플러그가 없습니다.'),
+                                    const SizedBox(height: 8),
+                                  ],
+                                );
+                              }).toList(),
+                            )
+                                : const Text('그룹 설정이 필요합니다.'),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('닫기', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      );
+                    },
+                  );
 
-                          // Dialog 표시
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text("그룹 설정 상태"),
-                                content: groupAction.isNotEmpty
-                                    ? Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: groupAction.map((action) {
-                                    return ListTile(
-                                      title: Text('Plug ID: ${action["plugId"]}'),
-                                      subtitle: Text('Control: ${action["plugControl"]}'),
-                                    );
-                                  }).toList(),
-                                )
-                                    : Text('그룹 설정이 필요합니다.'),
-                                actions: [
-                                  TextButton(
-                                    child: Text('닫기'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
 
-                      ),
-                    );
-                  },
-                ),
+
+                },
+
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
+
 }

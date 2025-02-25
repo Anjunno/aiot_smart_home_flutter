@@ -1,10 +1,11 @@
 
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:smarthometest/toastMessage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 
 ///기기 on/off
@@ -107,15 +108,22 @@ Future<List<Map<String, dynamic>>> groupActionCheck(groupId) async {
     if (response.statusCode == 200) {
       // JSON 데이터를 List<dynamic>으로 변환
       List<dynamic> data = jsonDecode(response.data);
-
+      print(data);
       // Map으로 변환
       List<Map<String, dynamic>> groupAction = data.map((item) {
         return {
           "groupId": item['groupId'],
-          "plugId": item['plugId'],
-          "plugControl": item['plugControl'],
+          "groupName": item['groupName'],
+          "plug": (item['plug'] as List).map((plug) {
+            return {
+              "plugId": plug['plugId'],
+              "plugName": plug['plugName'],
+              "plugControl": plug['plugControl'],
+            };
+          }).toList(),
         };
       }).toList();
+
 
       print("groupAction 내용:\n$groupAction");
       return groupAction;
@@ -130,23 +138,42 @@ Future<List<Map<String, dynamic>>> groupActionCheck(groupId) async {
 }
 
 //그룹 액션 실행
-Future<void> groupActionRun(groupId) async {
+Future<void> groupActionRun(int groupId) async {
   final url = dotenv.get("URL");
   final storage = FlutterSecureStorage();
   final accessToken = await storage.read(key: 'ACCESS_TOKEN');
   final dio = Dio();
 
-  final response = await dio.get(url + "/group/action/run/" + groupId.toString());
-  if (response.statusCode == 200) {
+  try {
+    final response = await dio.get("$url/group/action/run/$groupId");
     print(response);
-  } else {
-    print(response);
-    print("그룹 액션 실패: ${response.statusCode}");
+    print(response.statusCode);
+
+    // 응답이 JSON 문자열일 경우, JSON 파싱을 시도
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData =
+      response.data is String ? jsonDecode(response.data) : response.data;
+
+      //응답 데이터 처리
+      int successCount = responseData["successCount"];
+      int errorCount = responseData["errorCount"];
+      List<String> successArray = List<String>.from(responseData["successArray"]);
+      List<String> errorArray = List<String>.from(responseData["errorArray"]);
+
+      String message = "✅ 성공한 기기 ($successCount개):\n"
+          "${successArray.join(", ")}\n\n"
+          "❌ 실패한 기기 ($errorCount개):\n"
+          "${errorArray.isNotEmpty ? errorArray.join(", ") : "없음"}";
+      showToast(message, gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_LONG);
+    } else {
+      showToast("그룹 설정이 필요합니다.", gravity: ToastGravity.CENTER);
+      print("그룹 액션 실패: ${response.statusCode}");
+    }
+  } catch (e) {
+    showToast("네트워크 오류 발생", gravity: ToastGravity.CENTER);
+    print("오류 발생: $e");
   }
 }
-
-
-
 
 // List<Map<String, dynamic>> getDayData(BuildContext context)
 List<Map<String, dynamic>> getDeviceEData() {
