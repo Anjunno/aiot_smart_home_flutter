@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarthometest/login_page.dart';
 import 'package:smarthometest/myInfoPage.dart';
+import 'package:smarthometest/outing_page.dart';
 import 'package:smarthometest/toastMessage.dart';
 
 import 'deviceManagement/deviceManagementMain_page.dart';
@@ -111,6 +112,15 @@ class _TabPageState extends State<TabPage> {
                 // '내정보' 선택 시 실행할 기능
                 Navigator.pop(context);
                 Navigator.pushNamed(context, MyInfoPage.routeName);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.run_circle, color: colorScheme.onSurface,),
+              title: Text('외출모드', style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),),
+              onTap: () {
+                // '내정보' 선택 시 실행할 기능
+                Navigator.pop(context);
+                Navigator.pushNamed(context, OutingPage.routeName);
               },
             ),
             ListTile(

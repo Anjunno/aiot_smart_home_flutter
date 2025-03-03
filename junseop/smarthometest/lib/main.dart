@@ -8,6 +8,7 @@ import 'package:smarthometest/signUp_page.dart';
 import 'package:smarthometest/tab_page.dart';
 
 import 'deviceManagement/groupDeviceManagement_page.dart';
+import 'outing_page.dart';
 // Navigator.of(context).popUntil((route) => route.isFirst); 위젯트리 확인해보기
 Future<void> main() async {
   await dotenv.load();
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
             DevicemanagementPage.routeName: (context) => DevicemanagementPage(),
             GroupDevicemanagementPage.routeName: (context) => GroupDevicemanagementPage(),
             MyInfoPage.routeName: (context) => MyInfoPage(),
+            OutingPage.routeName: (context) => OutingPage(),
           },
         );
       },

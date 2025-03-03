@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:smarthometest/home/dayGraph.dart';
 import 'package:smarthometest/home/monthGraph.dart';
-
 import 'deviceGraph.dart';
+
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -12,46 +12,48 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0; // 현재 선택된 탭의 인덱스
-
-  // 각 탭에서 보여줄 페이지 목록
-  List _pages = [
-    DeviceGraph(), // 기기별 전력량 그래프
-    DayGraph(), // 일별 전력량 그래프
-    MonthGraph(), // 일별 전력량 그래프
-  ];
+  final PageController _pageController = PageController(); // 페이지 컨트롤러 생성
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Main Page'),
-      // ),
-
-
       body: Padding(
-        padding: EdgeInsets.fromLTRB(10, 10, 40, 10), // 모든 방향에 10씩 패딩 추가
-        child: _pages[_selectedIndex],
+        padding: const EdgeInsets.fromLTRB(10, 10, 40, 10), // 모든 방향에 패딩 추가
+        child: PageView(
+          controller: _pageController, // PageView에 컨트롤러 연결
+          onPageChanged: (index) {
+            // 스와이프 시 현재 페이지 인덱스 변경
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          children: const [
+            DeviceGraph(), // 기기별 전력량 그래프 페이지
+            DayGraph(), // 일별 전력량 그래프 페이지
+            MonthGraph(), // 월별 전력량 그래프 페이지
+          ],
+        ),
       ),
-    bottomNavigationBar: BottomNavigationBar(
-      selectedLabelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      onTap: _onItemTapped, // 탭 변경 이벤트 처리
-      currentIndex: _selectedIndex, // 현재 선택된 탭 표시
-      items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.devices), label: '기기'),
-          BottomNavigationBarItem(icon: Icon(Icons.schedule), label: '일별'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: '월별'),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedLabelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        onTap: (index) {
+          // 네비게이션 바 아이템 클릭 시 페이지 이동
+          setState(() {
+            _selectedIndex = index;
+          });
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300), // 애니메이션 지속 시간 설정
+            curve: Curves.easeInOut, // 애니메이션 곡선 설정
+          );
+        },
+        currentIndex: _selectedIndex, // 현재 선택된 인덱스 설정
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.devices), label: '기기'), // 기기별 탭
+          BottomNavigationBarItem(icon: Icon(Icons.schedule), label: '일별'), // 일별 탭
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: '월별'), // 월별 탭
         ],
       ),
     );
   }
-
-
-  // 탭 아이템 선택 시 실행되는 함수
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 }
-
-
