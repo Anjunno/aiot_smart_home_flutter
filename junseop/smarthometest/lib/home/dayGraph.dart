@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:smarthometest/request/graph_request.dart';
+import 'package:smarthometest/request/group_request.dart';
+
+import '../request/graph_request.dart';
 
 class DayGraph extends StatefulWidget {
   const DayGraph({super.key});

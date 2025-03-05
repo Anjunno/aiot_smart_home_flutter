@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarthometest/request/graph_request.dart';
+import 'package:smarthometest/request/group_request.dart';
 import 'package:smarthometest/toastMessage.dart';
 
 class OutingPage extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../request/graph_request.dart';
+import '../request/group_request.dart';
 
 class DeviceGraph extends StatefulWidget {
   const DeviceGraph({super.key});

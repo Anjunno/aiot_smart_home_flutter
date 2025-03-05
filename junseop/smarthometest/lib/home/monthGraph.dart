@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../request/graph_request.dart';
+import '../request/group_request.dart';
 
 class MonthGraph extends StatefulWidget {
   const MonthGraph({super.key});
