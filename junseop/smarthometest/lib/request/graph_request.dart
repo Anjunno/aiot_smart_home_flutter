@@ -7,48 +7,48 @@ import 'package:smarthometest/toastMessage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 // List<Map<String, dynamic>> getDayData(BuildContext context)
-List<Map<String, dynamic>> getDeviceEData() {
-  // List<dynamic> data = response.data;
-  List<dynamic> data = [
-    {
-      "device": "TV",
-      "electricalEnergy": 120.5
-    },
-    {
-      "device": "냉장고",
-      "electricalEnergy": 200.0
-    },
-    {
-      "device": "에어컨",
-      "electricalEnergy": 180.0
-    },
-    {
-      "device": "세탁기",
-      "electricalEnergy": 90.0
-    },
-    {
-      "device": "조명",
-      "electricalEnergy": 20.0
-    },
-    {
-      "device": "기타",
-      "electricalEnergy": 70.0
-    }
-  ];
-
-
-  List<Map<String, dynamic>> deviceList = data.map((item) {
-    return {
-      "device": item['device'],
-      "electricalEnergy": item['electricalEnergy']
-    };
-  }).toList();
-
-  // electricalEnergy를 기준으로 내림차순 정렬
-  deviceList.sort((a, b) => b['electricalEnergy'].compareTo(a['electricalEnergy']));
-
-  return deviceList;
-}
+// List<Map<String, dynamic>> getDeviceEData() {
+//   // List<dynamic> data = response.data;
+//   List<dynamic> data = [
+//     {
+//       "device": "TV",
+//       "electricalEnergy": 120.5
+//     },
+//     {
+//       "device": "냉장고",
+//       "electricalEnergy": 200.0
+//     },
+//     {
+//       "device": "에어컨",
+//       "electricalEnergy": 180.0
+//     },
+//     {
+//       "device": "세탁기",
+//       "electricalEnergy": 90.0
+//     },
+//     {
+//       "device": "조명",
+//       "electricalEnergy": 20.0
+//     },
+//     {
+//       "device": "기타",
+//       "electricalEnergy": 70.0
+//     }
+//   ];
+//
+//
+//   List<Map<String, dynamic>> deviceList = data.map((item) {
+//     return {
+//       "device": item['device'],
+//       "electricalEnergy": item['electricalEnergy']
+//     };
+//   }).toList();
+//
+//   // electricalEnergy를 기준으로 내림차순 정렬
+//   deviceList.sort((a, b) => b['electricalEnergy'].compareTo(a['electricalEnergy']));
+//
+//   return deviceList;
+// }
 
 //일별 전력량
 List<Map<String, dynamic>> getDayEData() {
@@ -145,7 +145,7 @@ List<Map<String, dynamic>> getDayEData() {
 //       'electricalEnergy': 480 // 난방 사용으로 소비량 증가
 //     },
 //   ];
-//
+
 //   List<Map<String, dynamic>> monthList = data.map((item) {
 //     return {
 //       "month": item['month'],
@@ -161,7 +161,7 @@ Future<List<Map<String, dynamic>>> getMonthEData() async {
   final storage = FlutterSecureStorage();
   final accessToken = await storage.read(key: 'ACCESS_TOKEN');
   final dio = Dio();
-  final response = await dio.get(url + "/group/check/list");
+  final response = await dio.get(url + "/usage/month");
 
   if (response.statusCode == 200) {
     List<dynamic> data = response.data as List<dynamic>;
@@ -172,9 +172,64 @@ Future<List<Map<String, dynamic>>> getMonthEData() async {
       };
     }).toList();
 
-    print("GroupList: $monthList");
+    print("monthList: $monthList");
     return monthList;
   } else {
     return [];
   }
 }
+
+///일별 전력량 요청
+// Future<List<Map<String, dynamic>>> getDayEData() async {
+//   final url = dotenv.get("URL");
+//   final storage = FlutterSecureStorage();
+//   final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+//   final dio = Dio();
+//   final response = await dio.get(url + "/usage/week/plug");
+//   print("일별 요청할게");
+//   if (response.statusCode == 200) {
+//     List<dynamic> data = response.data as List<dynamic>;
+//     List<Map<String, dynamic>> dayList = data.map((item) {
+//       return {
+//         "date": item['date'],
+//         "electricalEnergy": item['usage']
+//       };
+//     }).toList();
+//
+//     print("dayList: $dayList");
+//     return dayList;
+//   } else {
+//     return [];
+//   }
+// }
+
+///기기별 전력량 요청
+Future<List<Map<String, dynamic>>> getDeviceEData() async {
+  final url = dotenv.get("URL");
+  final storage = FlutterSecureStorage();
+  final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+  final dio = Dio();
+  final response = await dio.get(url + "/usage/week/groupPlug");
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response.data);
+
+    // 첫 번째 항목(메시지)을 제외한 나머지 데이터에서 usage가 0이 아닌 것만 필터링
+    List<Map<String, dynamic>> deviceList = data.skip(1).where((item) {
+      return item['usage'] != 0; // usage가 0인 데이터는 제외
+    }).map((item) {
+      return {
+        "plugName": item['plugName'],
+        "usage": item['usage'],
+        "plugId": item['plugId']
+      };
+    }).toList();
+    // electricalEnergy를 기준으로 내림차순 정렬
+  deviceList.sort((a, b) => b['usage'].compareTo(a['usage']));
+    print("Filtered plugList: $deviceList");
+    return deviceList;
+  } else {
+    return [];
+  }
+}
+
