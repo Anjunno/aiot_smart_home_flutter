@@ -82,7 +82,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                 await createGroup(groupName);
 
                 // 그룹 추가 후 목록 갱신
-                await _loadGroups(); // 👉 추가된 부분
+                await _loadGroups();
 
                 Navigator.pop(context);
               },
@@ -273,7 +273,10 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                       },
                     ),
                     IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.delete)),
+                        onPressed: () async {
+                          await groupDelete(_groups[index]["groupId"]);
+                          await _loadGroups();
+                        }, icon: const Icon(Icons.delete)),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context)
