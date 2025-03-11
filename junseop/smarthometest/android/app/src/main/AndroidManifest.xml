@@ -15,6 +15,7 @@
                     <!-- 배송지 피커를 위한 설정 -->
 <!--                <data android:scheme="kakao" />-->
                 <data android:scheme="@string/kakao_app_key" />
+<!--                <data android:scheme="@string/kakao_app_key" android:host="oauth"/>-->
 <!--                <data android:scheme="kakao${네이티브 키}" />-->
                 <data android:host="address" />
             </intent-filter>

@@ -28,25 +28,49 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loginWithKakao() async {
     try {
-      OAuthToken token;
+      OAuthToken token;  // OAuth 토큰을 저장할 변수
+
+      // 카카오톡이 설치되어 있는지 확인
       if (await isKakaoTalkInstalled()) {
-        token = await UserApi.instance.loginWithKakaoTalk();
+        try {
+          // 카카오톡 앱으로 로그인 시도
+          token = await UserApi.instance.loginWithKakaoTalk();
+          print('카카오톡으로 로그인 성공!');  // 로그인 성공 시 출력
+        } catch (error) {
+          print('카카오톡으로 로그인 실패: $error');  // 카카오톡 로그인 실패 시 출력
+
+          // 카카오톡 로그인 실패한 경우, 카카오 계정으로 로그인 시도
+          try {
+            token = await UserApi.instance.loginWithKakaoAccount();
+            print('카카오계정으로 로그인 성공!');  // 계정 로그인 성공 시 출력
+          } catch (error2) {
+            print('카카오계정으로도 로그인 실패: $error2');  // 계정 로그인 실패 시 출력
+            showToast('로그인 실패: ${error2.toString()}');  // 사용자에게 실패 메시지 토스트로 표시
+            return;  // 로그인 실패 시 종료
+          }
+        }
       } else {
+        // 카카오톡이 설치되어 있지 않으면 카카오 계정으로 로그인 시도
         token = await UserApi.instance.loginWithKakaoAccount();
+        print('카카오계정으로 로그인 성공!');  // 계정 로그인 성공 시 출력
       }
 
+      // 로그인 성공 후, 사용자 정보를 조회
       User user = await UserApi.instance.me();
-      print("카카오 로그인 성공: ${user.kakaoAccount?.profile?.nickname}");
+      print("카카오 로그인 최종 성공: ${user.kakaoAccount?.profile?.nickname}");  // 사용자 정보 출력
 
+      // 화면에 로그인 완료 후, 원하는 페이지로 이동
       if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, TabPage.routeName, (route) => false);
-        showToast("카카오 로그인 완료: ${user.kakaoAccount?.profile?.nickname}");
+        Navigator.pushNamedAndRemoveUntil(context, TabPage.routeName, (route) => false);  // 로그인 후 이동할 페이지로 이동
+        showToast("카카오 로그인 완료: ${user.kakaoAccount?.profile?.nickname}");  // 로그인 성공 토스트로 표시
       }
     } catch (e) {
-      print("카카오 로그인 실패: $e");
-      showToast("카카오 로그인 실패: ${e.toString()}");  // 오류 메시지를 정확히 표시
+      print("카카오 로그인 실패(예상치 못한 오류): $e");  // 예상치 못한 오류 출력
+      showToast("카카오 로그인 실패: ${e.toString()}");  // 사용자에게 오류 메시지 토스트로 표시
     }
   }
+
+
 
 
   @override
@@ -111,6 +135,10 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4)),
+                          ),
                           onPressed: () async {
                             if (_formKey.currentState?.validate() ?? false) {
                               String email = _emailController.text;
@@ -138,6 +166,10 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4)),
+                          ),
                           onPressed: () {
                             Navigator.pushNamed(context, SignUpPage.routeName);
                           },

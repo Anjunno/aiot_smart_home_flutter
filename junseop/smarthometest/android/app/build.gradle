@@ -1,3 +1,61 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // Flutter Gradle Plugin은 Android/Kotlin 다음에 위치
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+// .env 파일 로드
+def dotenv = new Properties()
+def dotenvFile = rootProject.file(".env")
+
+if (dotenvFile.exists()) {
+    dotenv.load(new FileInputStream(dotenvFile))
+}
+
+def kakaoKey = dotenv.getProperty('KAKAO_NATIVE_APP_KEY', "")
+
+android {
+    namespace = "com.example.smarthometest"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    defaultConfig {
+        applicationId = "com.example.smarthometest"
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+
+        println("KAKAO_NATIVE_APP_KEY: ${kakaoKey}")
+        buildConfigField "String", "KAKAO_NATIVE_APP_KEY", "\"${kakaoKey}\""
+        resValue "string", "kakao_app_key", kakaoKey
+    }
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
 //plugins {
 //    id "com.android.application"
 //    id "kotlin-android"
@@ -45,61 +103,3 @@
 //    source = "../.."
 //}
 
-plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id "dev.flutter.flutter-gradle-plugin"
-}
-
-// .env 파일 로드
-def dotenv = new Properties()
-def dotenvFile = rootProject.file(".env")
-
-if (dotenvFile.exists()) {
-    dotenv.load(new FileInputStream(dotenvFile))
-}
-
-// KAKAO_NATIVE_APP_KEY 가져오기 (기본 값 "" 설정)
-def kakaoKey = dotenv.getProperty('KAKAO_NATIVE_APP_KEY', "")
-
-android {
-    namespace = "com.example.smarthometest"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
-    }
-
-    defaultConfig {
-        applicationId = "com.example.smarthometest"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-
-
-        println("KAKAO_NATIVE_APP_KEY: ${kakaoKey}")
-        // .env 값을 BuildConfig로 추가
-        buildConfigField "String", "KAKAO_NATIVE_APP_KEY", "\"${kakaoKey}\""
-
-        // AndroidManifest.xml에서 사용하기 위한 문자열 리소스 추가
-        resValue "string", "kakao_app_key", kakaoKey
-    }
-
-    buildTypes {
-        release {
-            signingConfig = signingConfigs.debug
-        }
-    }
-}
-
-flutter {
-    source = "../.."
-}

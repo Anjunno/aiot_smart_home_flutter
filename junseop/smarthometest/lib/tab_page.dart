@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarthometest/chat_page.dart';
 import 'package:smarthometest/login_page.dart';
 import 'package:smarthometest/myInfoPage.dart';
 import 'package:smarthometest/outing_page.dart';
@@ -121,6 +122,15 @@ class _TabPageState extends State<TabPage> {
                 // '내정보' 선택 시 실행할 기능
                 Navigator.pop(context);
                 Navigator.pushNamed(context, OutingPage.routeName);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.chat, color: colorScheme.onSurface,),
+              title: Text('채팅', style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),),
+              onTap: () {
+                // '채팅' 선택 시 실행할 기능
+                Navigator.pop(context);
+                Navigator.pushNamed(context, ChatPage.routeName);
               },
             ),
             ListTile(

@@ -7,6 +7,7 @@ import 'package:smarthometest/myInfoPage.dart';
 import 'package:smarthometest/root_page.dart';
 import 'package:smarthometest/signUp_page.dart';
 import 'package:smarthometest/tab_page.dart';
+import 'chat_page.dart';
 import 'deviceManagement/groupDeviceManagement_page.dart';
 import 'outing_page.dart';
 // Navigator.of(context).popUntil((route) => route.isFirst); 위젯트리 확인해보기
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
             GroupDevicemanagementPage.routeName: (context) => GroupDevicemanagementPage(),
             MyInfoPage.routeName: (context) => MyInfoPage(),
             OutingPage.routeName: (context) => OutingPage(),
+            ChatPage.routeName: (context) => ChatPage(),
           },
         );
       },
