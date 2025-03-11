@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:smarthometest/deviceManagement/deviceManagement_page.dart';
 import 'package:smarthometest/login_page.dart';
 import 'package:smarthometest/myInfoPage.dart';
 import 'package:smarthometest/root_page.dart';
 import 'package:smarthometest/signUp_page.dart';
 import 'package:smarthometest/tab_page.dart';
-
 import 'deviceManagement/groupDeviceManagement_page.dart';
 import 'outing_page.dart';
 // Navigator.of(context).popUntil((route) => route.isFirst); 위젯트리 확인해보기
 Future<void> main() async {
   await dotenv.load();
+  await dotenv.load(fileName: ".env");
+  print("현재 Kakao SDK Origin: ${await KakaoSdk.origin}");
+  KakaoSdk.init(
+    nativeAppKey: dotenv.get("NATIVE_APP_KEY"),
+    javaScriptAppKey: dotenv.get("JAVASCRIPT_APP_KEY"),
+  );
+  // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

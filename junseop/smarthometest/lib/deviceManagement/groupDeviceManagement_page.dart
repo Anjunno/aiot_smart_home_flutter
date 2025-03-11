@@ -127,40 +127,51 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text("그룹 추가"),
+              title: const Text("그룹 추가", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               content: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    // 상태, 기기명, 사용 여부 레이블
+                    Text("기기 목록을 선택하고, 상태를 설정하세요.", style: TextStyle(fontSize: 16, color: Colors.grey)),
+                    const SizedBox(height: 10),
 
                     // 기기 목록 출력 및 선택
                     Column(
-                      // 그룹명 입력 필드
-                      // TextField(
-                      //   controller: groupNameController,
-                      //   decoration: const InputDecoration(labelText: "그룹명"),
-                      // ),
                       children: _devices.map((device) {
-                        return CheckboxListTile(
-                          title: Text(device['name']),
-                          subtitle: Text('ID: ${device['id']}'),
-                          value: deviceSelection[device['id']],
-                          onChanged: (bool? value) {
-                            setState(() {
-                              deviceSelection[device['id']] = value ?? false;
-                            });
-                          },
-                          // 기기 on/off 스위치
-                          secondary: Switch(
-                            value: deviceState[device['id']] == "on",
-                            onChanged: deviceSelection[device['id']]!
-                                ? (bool value) {
-                                    setState(() {
-                                      deviceState[device['id']] =
-                                          value ? "on" : "off";
-                                    });
-                                  }
-                                : null, // 체크 안된 기기는 비활성화
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(10),
+                            title: Text(device['name'], style: const TextStyle(fontSize: 16)),
+                            subtitle: Text('ID: ${device['id']}', style: const TextStyle(color: Colors.grey)),
+                            leading: Checkbox(
+                              value: deviceSelection[device['id']],
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  deviceSelection[device['id']] = value ?? false;
+                                });
+                              },
+                            ),
+                            trailing: Switch(
+                              value: deviceState[device['id']] == "on",
+                              onChanged: deviceSelection[device['id']]!
+                                  ? (bool value) {
+                                setState(() {
+                                  deviceState[device['id']] = value ? "on" : "off";
+                                });
+                              }
+                                  : null, // 체크 안된 기기는 비활성화
+                            ),
+                            onTap: () {
+                              setState(() {
+                                deviceSelection[device['id']] = !deviceSelection[device['id']]!;
+                              });
+                            },
                           ),
                         );
                       }).toList(),
@@ -172,30 +183,26 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                 // 취소 버튼
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("취소"),
+                  child: const Text("취소", style: TextStyle(fontSize: 16, color: Colors.red)),
                 ),
                 // 확인 버튼
                 ElevatedButton(
                   onPressed: () async {
-                    // String groupName = groupNameController.text;
-                    // if (groupName.isEmpty) {
-                    //   // 그룹명이 비어있을 경우 경고 메시지
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(content: Text('그룹명을 입력하세요.')),
-                    //   );
-                    //   return;
-                    // }
                     // 선택된 기기 목록 저장
                     List<Map<String, dynamic>> selectedDevices = _devices
-                        .where(
-                            (device) => deviceSelection[device['id']] == true)
+                        .where((device) => deviceSelection[device['id']] == true)
                         .map((device) => {
-                              "plugId": device['id'],
-                              "action": deviceState[device['id']]
-                            })
-                        .toList();
-                    print("액션설정\n" + selectedDevices.toString());
+                      "plugId": device['id'],
+                      "action": deviceState[device['id']]
+                    }).toList();
 
+                    if (selectedDevices.isEmpty) {
+                      // 체크된 기기가 없을 경우 토스트 메시지 표시
+                      showToast("최소 하나의 기기를 설정해주세요.", gravity: ToastGravity.CENTER);
+                      return;  // 함수 종료
+                    }
+
+                    print("액션설정\n" + selectedDevices.toString());
                     groupData = {
                       "groupId": groupId,
                       "devices": selectedDevices,
@@ -209,14 +216,16 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
 
                     Navigator.pop(context);
                   },
-                  child: const Text("확인"),
-                ),
+                  child: const Text("확인", style: TextStyle(fontSize: 16)),
+                )
               ],
             );
+
           },
         );
       },
     );
+
   }
 
   // ⭐ 그룹 전체 상태 변경 ⭐
@@ -277,18 +286,23 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                           await groupDelete(_groups[index]["groupId"]);
                           await _loadGroups();
                         }, icon: const Icon(Icons.delete)),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context)
-                              .colorScheme
-                              .onInverseSurface,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4)),
-                        ),
-                        onPressed: () {
-                          groupActionRun(_groups[index]["groupId"]);
-                        },
-                        child: Text("실행")),
+                    IconButton(onPressed: () {
+                      groupActionRun(_groups[index]["groupId"]);
+                    },
+                        icon: const Icon(Icons.play_arrow)),
+                    // ElevatedButton(
+                    //     style: ElevatedButton.styleFrom(
+                    //       backgroundColor: Theme.of(context)
+                    //           .colorScheme
+                    //           .onInverseSurface,
+                    //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    //       elevation: 10
+                    //     ),
+                    //     onPressed: () {
+                    //       groupActionRun(_groups[index]["groupId"]);
+                    //     },
+                    //     child: Text("실행")
+                    // ),
                   ],
                 ),
                 onTap: () async {
@@ -389,11 +403,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                       );
                     },
                   );
-
-
-
                 },
-
               ),
             );
           },

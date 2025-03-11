@@ -164,7 +164,7 @@ Future<List<Map<String, dynamic>>> getMonthEData() async {
   final response = await dio.get(url + "/usage/month");
 
   if (response.statusCode == 200) {
-    List<dynamic> data = response.data as List<dynamic>;
+    List<dynamic> data = jsonDecode(response.data);
     List<Map<String, dynamic>> monthList = data.map((item) {
       return {
         "month": item['date'],
@@ -213,7 +213,15 @@ Future<List<Map<String, dynamic>>> getDeviceEData() async {
 
   if (response.statusCode == 200) {
     List<dynamic> data = jsonDecode(response.data);
+    print(data);
 
+    // List<Map<String, dynamic>> deviceList = data.skip(1).map((item) {
+    //   return {
+    //     "plugName": item['plugName'],
+    //     "usage": item['usage'],
+    //     "plugId": item['plugId']
+    //   };
+    // }).toList();
     // 첫 번째 항목(메시지)을 제외한 나머지 데이터에서 usage가 0이 아닌 것만 필터링
     List<Map<String, dynamic>> deviceList = data.skip(1).where((item) {
       return item['usage'] != 0; // usage가 0인 데이터는 제외
