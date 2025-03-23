@@ -1,3 +1,18 @@
+buildscript {
+    ext.kotlin_version = '2.0.0' // ✅ 최신 Kotlin 버전
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.2.1" // ✅ Gradle Plugin 최신 안정 버전
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.google.gms:google-services:4.4.2" // ✅ FCM용
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -16,3 +31,28 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
+////fcm
+//plugins {
+//    id 'com.google.gms.google-services' version '4.4.2' apply false
+//}
+//
+//
+//allprojects {
+//    repositories {
+//        google()
+//        mavenCentral()
+//    }
+//}
+//
+//rootProject.buildDir = "../build"
+//subprojects {
+//    project.buildDir = "${rootProject.buildDir}/${project.name}"
+//}
+//subprojects {
+//    project.evaluationDependsOn(":app")
+//}
+//
+//tasks.register("clean", Delete) {
+//    delete rootProject.buildDir
+//}

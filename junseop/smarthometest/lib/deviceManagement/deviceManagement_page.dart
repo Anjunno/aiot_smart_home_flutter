@@ -22,7 +22,7 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
 
   Future<void> _loadDevices() async {
     setState(() {
-      _devicesFuture = getDeviceList();
+      _devicesFuture = getDeviceList(context);
     });
   }
 
@@ -30,8 +30,14 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
     String deviceId = _devices[index]['id'];
     String onOff = value ? "on" : "off";
 
+    if(!_devices[index]["online"]) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("${_devices[index]["name"]}이(가) 오프라인입니다.")),);
+      return;
+    }
+
     try {
-      bool success = await onOffDevice(deviceId, onOff);
+      bool success = await onOffDevice(context, deviceId, onOff);
       if (success) {
         setState(() {
           _deviceStates[index] = value;
@@ -134,13 +140,31 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
                 itemCount: _devices.length,
                 itemBuilder: (context, index) {
                   final device = _devices[index];
+                  final isOnline = device['online'];
+
                   return Card(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 3,
                     child: ListTile(
                       leading: const Icon(Icons.devices),
                       title: Text(device['name']),
-                      subtitle: Text('기기 ID: ${device['id']}'),
+                      subtitle: Row(
+                        children: [
+                          Icon(
+                            isOnline ? Icons.wifi : Icons.wifi_off,
+                            color: isOnline ? Colors.green : Colors.red,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            isOnline ? '온라인' : '오프라인',
+                            style: TextStyle(
+                              color: isOnline ? Colors.green : Colors.red,
+                              // fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                       trailing: Switch(
                         value: _deviceStates[index],
                         onChanged: (value) => _toggleDeviceState(index, value),
@@ -150,6 +174,7 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
                   );
                 },
               );
+
             }
           },
         ),

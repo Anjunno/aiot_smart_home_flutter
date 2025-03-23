@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:smarthometest/toastMessage.dart';
@@ -38,9 +39,12 @@ import '../dioRequest.dart';
 //     return false; // 에러 발생 시 false 반환
 //   }
 // }
-Future<bool> onOffDevice(String deviceId, String onOff) async {
-  final response = await dioRequest("POST", "/control/device/$deviceId", data: {"action": onOff});
-  if (response != null && response.statusCode == 200 && response.data['status'] == 'success') {
+Future<bool> onOffDevice(BuildContext context, String deviceId, String onOff) async {
+  print("---------------기기제어 요청 시작---------------------");
+  final response = await dioRequest("POST", "/control/device/$deviceId", data: {"action": onOff}, context: context);
+  print("기기 제어 요청 결과앙 : $response?.data");
+  if (response?.statusCode == 200) {
+  // if (response != null && response.statusCode == 200 && response.data['status'] == 'success') {
     print("기기 ${onOff == 'on' ? '켜짐' : '꺼짐'}: $deviceId");
     return true;
   }
@@ -55,7 +59,12 @@ Future<bool> onOffDevice(String deviceId, String onOff) async {
 //   final url = dotenv.get("URL");
 //   final storage = FlutterSecureStorage();
 //   final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+//   print("엑세스토큰은 : $accessToken");
 //   final dio = Dio();
+//   // dio.options.headers = {
+//   //   'Authorization': 'Bearer $accessToken',
+//   //   'Content-Type': 'application/json',
+//   // };
 //   final response = await dio.get(url + "/group/check/list");
 //
 //   if (response.statusCode == 200) {
@@ -74,16 +83,53 @@ Future<bool> onOffDevice(String deviceId, String onOff) async {
 //     return [];
 //   }
 // }
-Future<List<Map<String, dynamic>>> getGroupList() async {
-  final response = await dioRequest("GET", "/group/check/list");
+Future<List<Map<String, dynamic>>> getGroupList(BuildContext context) async {
+  final response = await dioRequest("GET", "/group/check/list", context: context);
+
   if (response == null || response.statusCode != 200) return [];
 
-  return List<Map<String, dynamic>>.from(response.data.map((item) => {
-    "groupId": item['groupId'],
-    "groupName": item['groupName'],
-    "creationTime": item['creationTime'],
-  }));
+  if (response.data == null) return [];
+
+  if (response.data is String) {
+    String responseString = response.data.trim();
+
+    // 비어있는 문자열일 경우 빈 리스트 반환
+    if (responseString.isEmpty) {
+      print("응답이 빈 문자열입니다.");
+      return [];
+    }
+
+    try {
+      final decoded = jsonDecode(responseString);
+
+      if (decoded is List) {
+        return decoded.map<Map<String, dynamic>>((item) => {
+          "groupId": item['groupId'],
+          "groupName": item['groupName'],
+          "creationTime": item['creationTime'],
+        }).toList();
+      } else {
+        print("예상과 다른 데이터 타입입니다: ${decoded.runtimeType}");
+        return [];
+      }
+    } catch (e) {
+      print("jsonDecode 실패: $e");
+      return [];
+    }
+  }
+
+  if (response.data is List) {
+    return (response.data as List).map<Map<String, dynamic>>((item) => {
+      "groupId": item['groupId'],
+      "groupName": item['groupName'],
+      "creationTime": item['creationTime'],
+    }).toList();
+  }
+
+  print("예상하지 못한 데이터 타입입니다: ${response.data.runtimeType}");
+  return [];
 }
+
 
 ///그룹 이름 생성
 // //그룹 이름 생성
@@ -102,8 +148,8 @@ Future<List<Map<String, dynamic>>> getGroupList() async {
 //     print("그룹 생성 실패: ${response.statusCode}");
 //   }
 // }
-Future<void> createGroup(String groupName) async {
-  final response = await dioRequest("POST", "/group/create", data: {"groupName": "$groupName 그룹"});
+Future<void> createGroup(BuildContext context, String groupName) async {
+  final response = await dioRequest("POST", "/group/create", data: {"groupName": "$groupName 그룹"}, context: context);
   if (response?.statusCode == 200) {
     print("그룹 생성 성공: $groupName");
   } else {
@@ -125,8 +171,8 @@ Future<void> createGroup(String groupName) async {
 //     print("그룹 액션 추가 실패: ${response.statusCode}");
 //   }
 // }
-Future<void> groupAction(Map<String, dynamic> groupData) async {
-  final response = await dioRequest("POST", "/group/action/edit", data: groupData);
+Future<void> groupAction(BuildContext context, Map<String, dynamic> groupData) async {
+  final response = await dioRequest("PUT", "/group/action/edit", data: groupData, context: context);
 
   if (response?.statusCode == 200) {
     print("그룹 액션 추가 성공: $groupData");
@@ -179,8 +225,8 @@ Future<void> groupAction(Map<String, dynamic> groupData) async {
 //     return [];
 //   }
 // }
-Future<List<Map<String, dynamic>>> groupActionCheck(int groupId) async {
-  final response = await dioRequest("GET", "/group/action/check/$groupId");
+Future<List<Map<String, dynamic>>> groupActionCheck(BuildContext context, int groupId) async {
+  final response = await dioRequest("GET", "/group/action/check/$groupId", context: context);
   if (response == null || response.statusCode != 200) return [];
 
   List<dynamic> data = response.data is String ? jsonDecode(response.data) : response.data;
@@ -235,8 +281,8 @@ Future<List<Map<String, dynamic>>> groupActionCheck(int groupId) async {
 //     print("오류 발생: $e");
 //   }
 // }
-Future<void> groupActionRun(int groupId) async {
-  final response = await dioRequest("GET", "/group/action/run/$groupId");
+Future<void> groupActionRun(BuildContext context, int groupId) async {
+  final response = await dioRequest("GET", "/group/action/run/$groupId", context: context);
 
   if (response == null || response.statusCode != 200) {
     showToast("그룹 설정이 필요합니다.", gravity: ToastGravity.CENTER);
@@ -295,8 +341,8 @@ Future<void> groupActionRun(int groupId) async {
 //     return [];
 //   }
 // }
-Future<List<Map<String, dynamic>>> getDeviceList() async {
-  final response = await dioRequest("GET", "/check/plugList");
+Future<List<Map<String, dynamic>>> getDeviceList(BuildContext context) async {
+  final response = await dioRequest("GET", "/check/plugList", context: context);
 
   if (response == null || response.statusCode != 200) return [];
 
@@ -315,8 +361,9 @@ Future<List<Map<String, dynamic>>> getDeviceList() async {
 }
 
 ///그룹 삭제
-Future<void> groupDelete(int groupId) async {
-  final response = await dioRequest("GET", "/group/remove/$groupId");
+Future<void> groupDelete(BuildContext context, int groupId) async {
+  print("그룹 아이디는 : $groupId");
+  final response = await dioRequest("DELETE", "/group/remove/$groupId", context: context);
 
   if (response == null || response.statusCode != 200) {
     print("그룹이 존재하지 않습니다.: ${response?.statusCode}");

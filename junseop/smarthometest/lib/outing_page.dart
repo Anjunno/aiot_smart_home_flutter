@@ -31,7 +31,8 @@ class _OutingPageState extends State<OutingPage> {
     });
 
     // 서버에서 그룹 목록을 가져오는 비동기 요청
-    var groups = await getGroupList();
+    // var groups = await getGroupList(context);
+    var groups = await getGroupList(context);
     setState(() {
       _groups = groups;
       isLoading = false; // 데이터 로딩 완료 후 로딩 상태 비활성화
@@ -41,7 +42,7 @@ class _OutingPageState extends State<OutingPage> {
   // ⭐ 기기 목록 불러오기 ⭐
   Future<void> _loadDevices() async {
     // 서버에서 기기 목록을 가져오는 비동기 요청
-    var devices = await getDeviceList();
+    var devices = await getDeviceList(context);
     setState(() {
       _devices = devices;
     });
@@ -77,7 +78,7 @@ class _OutingPageState extends State<OutingPage> {
                 }
 
                 print("그룹이름 요청할게");
-                await createGroup(groupName);
+                await createGroup(context, groupName);
 
                 // 그룹 추가 후 목록 갱신
                 await _loadGroups(); // 👉 추가된 부분
@@ -203,7 +204,7 @@ class _OutingPageState extends State<OutingPage> {
                       print(groupData); // 디버깅용 출력
                     });
 
-                    await groupAction(groupData);
+                    await groupAction(context, groupData);
 
                     Navigator.pop(context);
                   },
@@ -281,14 +282,14 @@ class _OutingPageState extends State<OutingPage> {
                               borderRadius: BorderRadius.circular(4)),
                         ),
                         onPressed: () {
-                          groupActionRun(_groups[index]["groupId"]);
+                          groupActionRun(context, _groups[index]["groupId"]);
                         },
                         child: Text("실행")),
                   ],
                 ),
                 onTap: () async {
                   // groupActionCheck 결과 받아오기
-                  List<Map<String, dynamic>> groupAction = await groupActionCheck(_groups[index]["groupId"]);
+                  List<Map<String, dynamic>> groupAction = await groupActionCheck(context, _groups[index]["groupId"]);
 
                   // 다이얼로그 표시
                   showDialog(

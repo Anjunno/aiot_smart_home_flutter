@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../request/graph_request.dart';
+import '../../request/graph_request.dart';
 
 class MonthGraph extends StatefulWidget {
   const MonthGraph({super.key});
@@ -12,6 +12,7 @@ class MonthGraph extends StatefulWidget {
 
 class _MonthGraphState extends State<MonthGraph> {
   List<Map<String, dynamic>> energyData = [];
+  bool _isLoading = true; // 로딩 상태 추가
 
   @override
   void initState() {
@@ -20,13 +21,14 @@ class _MonthGraphState extends State<MonthGraph> {
   }
 
   Future<void> fetchMonthData() async {
-    List<Map<String, dynamic>> data = await getMonthEData();
+    List<Map<String, dynamic>> data = await getMonthEData(context);
 
     // 날짜를 기준으로 정렬 (오름차순)
     data.sort((a, b) => a['month'].compareTo(b['month']));
 
     setState(() {
       energyData = data;
+      _isLoading = false; // 로딩 완료
     });
   }
 
@@ -44,14 +46,21 @@ class _MonthGraphState extends State<MonthGraph> {
 
     double horizontalInterval = maxEnergy / 5;
 
-    return energyData.isEmpty
-        ? const Center(child: CircularProgressIndicator())
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator()) // 로딩 인디케이터 표시
+        : energyData.isEmpty
+        ? const Center(
+      child: Text(
+        "사용한 전력이 없습니다",
+        style: TextStyle(fontSize: 16,),
+      ),
+    )
         : Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
+            padding: const EdgeInsets.fromLTRB(8, 32, 16, 16),
             child: LineChart(
               LineChartData(
                 backgroundColor: Theme.of(context).colorScheme.background,

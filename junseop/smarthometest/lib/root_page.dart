@@ -1,47 +1,108 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:smarthometest/tab_page.dart';
-import 'package:smarthometest/login_page.dart'; // 로그인 페이지 import
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:smarthometest/login_page.dart';
+import 'package:smarthometest/main_page.dart';
+import 'main.dart';
 
-class RootPage extends StatelessWidget {
+class RootPage extends StatefulWidget {
   static String routeName = "/RootPage";
   const RootPage({super.key});
 
-  // 🔒 Secure Storage 인스턴스 생성 (iOS의 경우 Keychain 사용)
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  @override
+  State<RootPage> createState() => _RootPageState();
+}
 
-  // 📌 비동기 함수: Secure Storage에서 accessToken 가져오기
-  Future<String?> _getAccessToken() async {
-    return await _secureStorage.read(key: 'accessToken');
+class _RootPageState extends State<RootPage> {
+  RemoteMessage? _initialMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _initFCM();
+  }
+
+  Future<void> _requestAndroidNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }
+  }
+
+
+  // ✅ FCM 초기화 + 권한 + 토큰 + 푸시 핸들링
+  Future<void> _initFCM() async {
+    await _requestAndroidNotificationPermission();
+    // 🔑 1. 알림 권한 요청 (iOS & Android 13 이상 필수)
+    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('✅ 알림 권한 허용됨');
+    } else {
+      print('❌ 알림 권한 거부됨');
+      return; // 권한 없으면 푸시 작동 안 하므로 종료
+    }
+
+    // 🔑 2. FCM 토큰 받아오기
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    print('📱 FCM Token: $fcmToken');
+
+    // TODO: 서버로 토큰 전송 로직 추가 (필요시)
+
+    // 🔔 3. 백그라운드 푸시 클릭 시
+    FirebaseMessaging.onMessageOpenedApp.listen(_handlePushNavigation);
+
+    // 🔔 4. 포그라운드 푸시 수신 시
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+
+      if (notification != null && android != null) {
+        await flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channelDescription: channel.description,
+              importance: Importance.max,
+              priority: Priority.high,
+              icon: '@mipmap/ic_launcher',
+            ),
+          ),
+        );
+      }
+    });
+
+    // 🔁 5. 종료 상태에서 푸시 클릭
+    _initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (_initialMessage != null) {
+      _handlePushNavigation(_initialMessage!);
+    }
+  }
+
+  // 🔄 푸시 메시지를 눌렀을 때 라우팅 처리
+  void _handlePushNavigation(RemoteMessage message) {
+    final type = message.data['type'];
+    if (type == 'chat') {
+      print("chat으로 왔어요");
+      Navigator.pushNamed(context, MainPage.routeName);
+      // Navigator.pushNamed(context, '/chat');
+    } else if (type == 'notice') {
+      // Navigator.pushNamed(context, '/myInfo');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: _getAccessToken(), // accessToken 가져오기
-      builder: (context, snapshot) {
-        // 📌 데이터 로딩 중 (비동기 작업 진행 중)
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()), // 로딩 화면 표시
-          );
-        }
-
-        // 📌 에러 발생 시 (예외 처리)
-        if (snapshot.hasError) {
-          return const Scaffold(
-            body: Center(child: Text('오류가 발생했습니다. 다시 시도해주세요.')),
-          );
-        }
-
-        // 📌 accessToken이 없으면 로그인 페이지로 이동
-        if (snapshot.data == null || snapshot.hasError) {
-          return const LoginPage();
-        }
-
-        // 📌 accessToken이 있으면 TabPage로 이동
-        return const TabPage();
-      },
-    );
+    // 🔓 자동 로그인 제거 → 무조건 로그인 페이지로 이동
+    return const LoginPage();
   }
 }

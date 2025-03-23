@@ -1,19 +1,21 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // Flutter Gradle Plugin은 Android/Kotlin 다음에 위치
+    id "com.google.gms.google-services"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-// .env 파일 로드
+//// ✅ .env 파일 로드
 def dotenv = new Properties()
-def dotenvFile = rootProject.file(".env")
+def dotenvFile = file("$rootDir/../.env")
+println("🔍 dotenvFile path: ${dotenvFile.absolutePath}")
 
 if (dotenvFile.exists()) {
+    println("✅ FOUND .env")
     dotenv.load(new FileInputStream(dotenvFile))
+} else {
+    throw new FileNotFoundException("❌ NOT_FOUND: ${dotenvFile.absolutePath}")
 }
-
-def kakaoKey = dotenv.getProperty('KAKAO_NATIVE_APP_KEY', "")
 
 android {
     namespace = "com.example.smarthometest"
@@ -23,6 +25,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true // ✅ 필수
     }
 
     kotlinOptions {
@@ -40,9 +43,22 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
+
+        def kakaoKey = dotenv['KAKAO_NATIVE_APP_KEY']
+        if(kakaoKey == null) {
+            throw new GradleException("KAKAO_NATIVE_APP_KEY NOT FOUND")
+        }
+//        // ✅ 콘솔 확인용
         println("KAKAO_NATIVE_APP_KEY: ${kakaoKey}")
+//
+        // ✅ buildConfigField / resValue (필요시)
         buildConfigField "String", "KAKAO_NATIVE_APP_KEY", "\"${kakaoKey}\""
         resValue "string", "kakao_app_key", kakaoKey
+//
+//        // ✅ AndroidManifest.xml에서 사용할 placeholder
+        manifestPlaceholders = [
+                kakao_app_key: "${kakaoKey}"
+        ]
     }
 
     buildTypes {
@@ -55,6 +71,16 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // ✅ desugaring
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+
+    // ✅ Firebase
+    implementation platform('com.google.firebase:firebase-bom:33.11.0')
+    implementation 'com.google.firebase:firebase-analytics'
+}
+
 
 //plugins {
 //    id "com.android.application"

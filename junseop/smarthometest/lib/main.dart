@@ -1,28 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:smarthometest/deviceManagement/deviceManagement_page.dart';
-import 'package:smarthometest/login_page.dart';
-import 'package:smarthometest/myInfoPage.dart';
-import 'package:smarthometest/root_page.dart';
-import 'package:smarthometest/signUp_page.dart';
-import 'package:smarthometest/tab_page.dart';
-import 'chat_page.dart';
+import 'package:smarthometest/home/graph/graphMain_page.dart';
+import 'package:smarthometest/main_page.dart';
+import 'package:smarthometest/onboarding_page.dart';
+import 'package:smarthometest/providers/kakao_user_provider.dart';
+import 'package:smarthometest/providers/user_provider.dart';
+import 'package:smarthometest/pushTest.dart';
+
+import 'deviceManagement/deviceManagement_page.dart';
 import 'deviceManagement/groupDeviceManagement_page.dart';
+import 'login_page.dart';
+import 'myInfoPage.dart';
+import 'root_page.dart';
+import 'signUp_page.dart';
+import 'tab_page.dart';
+import 'chat_page.dart';
 import 'outing_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:firebase_core/firebase_core.dart'; // 이거 추가
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 // Navigator.of(context).popUntil((route) => route.isFirst); 위젯트리 확인해보기
-Future<void> main() async {
+// flutter run -d chrome --web-port=8080
+
+
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'default_channel', // ID
+  '기본 채널', // 이름
+  description: '앱에서 사용하는 기본 알림 채널입니다.',
+  importance: Importance.high,
+);
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('🔔 백그라운드 또는 종료 상태에서 받은 메시지: ${message.messageId}');
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ Firebase 초기화 먼저!
+  await Firebase.initializeApp();
+
+  // ✅ 그 다음 .env 로딩
   await dotenv.load();
   await dotenv.load(fileName: ".env");
+
   print("현재 Kakao SDK Origin: ${await KakaoSdk.origin}");
+
+  // ✅ FirebaseMessaging 핸들러는 초기화 이후 등록
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   KakaoSdk.init(
     nativeAppKey: dotenv.get("NATIVE_APP_KEY"),
     javaScriptAppKey: dotenv.get("JAVASCRIPT_APP_KEY"),
   );
-  // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+
+  // ✅ 알림 초기화
+  const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const initSettings = InitializationSettings(android: androidInit);
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => KaKaoUserProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
+
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -55,6 +119,10 @@ class MyApp extends StatelessWidget {
             MyInfoPage.routeName: (context) => MyInfoPage(),
             OutingPage.routeName: (context) => OutingPage(),
             ChatPage.routeName: (context) => ChatPage(),
+            MainPage.routeName: (context) => MainPage(),
+            GraphMainPage.routeName: (context) => GraphMainPage(),
+            OnboardingPage.routeName: (context) => OnboardingPage(),
+            PushTest.routeName: (context) => PushTest(),
           },
         );
       },

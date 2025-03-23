@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:smarthometest/providers/kakao_user_provider.dart';
+import 'package:smarthometest/providers/user_provider.dart';
 
 class MyInfoPage extends StatelessWidget {
   static String routeName = "/MyInfoPage";
@@ -6,10 +9,20 @@ class MyInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final kakaoUserProvider = Provider.of<KaKaoUserProvider>(context);
+    final kakaoUser = kakaoUserProvider.user;
+    final userProvider = Provider.of<UserProvider>(context);
+    final user = userProvider.name;
+
+    final String nickname = kakaoUser?.kakaoAccount?.profile?.nickname ?? (user ?? "사용자").toString();
+    final String email = kakaoUser?.kakaoAccount?.email ?? '이메일 정보가 없습니다!';
+    final String? profileImageUrl = kakaoUser?.kakaoAccount?.profile?.profileImageUrl;
+
     return Scaffold(
       body: Column(
         children: [
-          const Expanded(flex: 2, child: _TopPortion()),
+          // ✅ 유저 프로필 이미지 전달
+          Expanded(flex: 2, child: _TopPortion(profileImageUrl: profileImageUrl)),
           Expanded(
             flex: 3,
             child: Padding(
@@ -17,12 +30,13 @@ class MyInfoPage extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    "사용자",
+                    nickname, // ✅ 닉네임 적용
                     style: Theme.of(context)
                         .textTheme
                         .titleLarge
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
+                  Text(email), // ✅ 이메일 적용
                   const SizedBox(height: 16),
                   const _ProfileInfoRow(),
                   const SizedBox(height: 16),
@@ -31,21 +45,23 @@ class MyInfoPage extends StatelessWidget {
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4)),
-                          ),
-                          onPressed: () {Navigator.pop(context);},
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.arrow_back_ios),
-                              Text(
-                                '뒤로가기',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.arrow_back_ios),
+                            Text(
+                              '뒤로가기',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   )
@@ -77,12 +93,13 @@ class _ProfileInfoRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: _items
             .map((item) => Expanded(
-            child: Row(
-              children: [
-                if (_items.indexOf(item) != 0) const VerticalDivider(),
-                Expanded(child: _singleItem(context, item)),
-              ],
-            )))
+          child: Row(
+            children: [
+              if (_items.indexOf(item) != 0) const VerticalDivider(),
+              Expanded(child: _singleItem(context, item)),
+            ],
+          ),
+        ))
             .toList(),
       ),
     );
@@ -116,7 +133,8 @@ class ProfileInfoItem {
 }
 
 class _TopPortion extends StatelessWidget {
-  const _TopPortion({Key? key}) : super(key: key);
+  final String? profileImageUrl; // ✅ 전달받은 프로필 이미지 URL
+  const _TopPortion({Key? key, this.profileImageUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -125,15 +143,20 @@ class _TopPortion extends StatelessWidget {
       children: [
         Container(
           margin: const EdgeInsets.only(bottom: 50),
-          decoration:  BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary]),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(50),
-                bottomRight: Radius.circular(50),
-              )),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.secondary
+              ],
+            ),
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(50),
+              bottomRight: Radius.circular(50),
+            ),
+          ),
         ),
         Align(
           alignment: Alignment.bottomCenter,
@@ -144,16 +167,18 @@ class _TopPortion extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 Container(
-                  decoration:  BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surfaceBright,
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: AssetImage("assets/good.png"),
-                      fit: BoxFit.cover, //이미지 크기 조정
+                      // ✅ 유저 이미지가 있을 때는 NetworkImage, 없을 때는 AssetImage
+                      image: profileImageUrl != null
+                          ? NetworkImage(profileImageUrl!) as ImageProvider
+                          : const AssetImage("assets/good.png"),
+                      fit: BoxFit.cover, // 이미지 크기 조정
                     ),
                   ),
-                )
-
+                ),
               ],
             ),
           ),

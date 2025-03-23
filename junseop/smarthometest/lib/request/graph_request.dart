@@ -1,97 +1,65 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:smarthometest/toastMessage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-// List<Map<String, dynamic>> getDayData(BuildContext context)
-// List<Map<String, dynamic>> getDeviceEData() {
-//   // List<dynamic> data = response.data;
-//   List<dynamic> data = [
-//     {
-//       "device": "TV",
-//       "electricalEnergy": 120.5
-//     },
-//     {
-//       "device": "냉장고",
-//       "electricalEnergy": 200.0
-//     },
-//     {
-//       "device": "에어컨",
-//       "electricalEnergy": 180.0
-//     },
-//     {
-//       "device": "세탁기",
-//       "electricalEnergy": 90.0
-//     },
-//     {
-//       "device": "조명",
-//       "electricalEnergy": 20.0
-//     },
-//     {
-//       "device": "기타",
-//       "electricalEnergy": 70.0
-//     }
-//   ];
-//
-//
-//   List<Map<String, dynamic>> deviceList = data.map((item) {
-//     return {
-//       "device": item['device'],
-//       "electricalEnergy": item['electricalEnergy']
-//     };
-//   }).toList();
-//
-//   // electricalEnergy를 기준으로 내림차순 정렬
-//   deviceList.sort((a, b) => b['electricalEnergy'].compareTo(a['electricalEnergy']));
-//
-//   return deviceList;
-// }
+import '../dioRequest.dart';
 
-//일별 전력량
-List<Map<String, dynamic>> getDayEData() {
-  // List<dynamic> data = response.data;
-  List<dynamic> data = [
-    {
-      "date": "24/10/08",
-      "electricalEnergy": 1.8
-    },
-    {
-      "date": "24/10/09", // 월요일
-      "electricalEnergy": 1.2 // 평일, 사용량이 약간 낮음
-    },
-    {
-      "date": "24/10/10", // 화요일
-      "electricalEnergy": 1.3 // 평일, 일반적인 사용량
-    },
-    {
-      "date": "24/10/11", // 수요일
-      "electricalEnergy": 1.1 // 평일, 사용량이 조금 더 낮음
-    },
-    {
-      "date": "24/10/12", // 목요일
-      "electricalEnergy": 1.4 // 평일, 사용량이 다시 상승
-    },
-    {
-      "date": "24/10/13", // 금요일
-      "electricalEnergy": 1.5 // 평일, 주말을 앞두고 약간의 증가
-    },
-    {
-      "date": "24/10/14", // 토요일
-      "electricalEnergy": 2.0 // 주말, 사용량 증가
-    },
-  ];
+///일별 전력량 요청
+Future<List<Map<String, dynamic>>> getDayEData(BuildContext context) async{
+  final response = await dioRequest("GET", "/usage/week", context: context);
 
-  List<Map<String, dynamic>> dayList = data.map((item) {
-    return {
-      "date": item['date'],
-      "electricalEnergy": item['electricalEnergy']
-    };
-  }).toList();
-  return dayList;
+  if (response?.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response?.data);
+    List<Map<String, dynamic>> dayList = data.map((item) {
+
+      List<String> dateParts = item['date'].split('-');
+      String formattedDate = "${int.parse(dateParts[1])}/${int.parse(dateParts[2])}";
+
+      return {
+        "date": formattedDate,
+        "electricalEnergy": item['usage']
+      };
+    }).toList();
+
+    print("dayList: $dayList");
+    return dayList;
+  } else {
+    return [];
+  }
 }
+
+Future<List<Map<String, dynamic>>> getDayDeviceEData(BuildContext context, String deviceId) async {
+  print("일별 단일기기 요청 시작");
+  final response = await dioRequest("GET", "/usage/week/plug/" + deviceId, context: context);
+
+  if (response?.statusCode == 200) {
+    print("오케이");
+    print(response);
+    List<dynamic> data = jsonDecode(response?.data);
+    List<Map<String, dynamic>> dayDeviceList = data.map((item) {
+      // "t"는 "2025-03-14 00:00:00" 형식으로 되어있으므로 DateTime으로 변환
+      DateTime dateTime = DateTime.parse(item['t']);
+      // 날짜를 "MM/dd" 형식으로 변환
+      String formattedDate = "${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}";
+
+      return {
+        "date": formattedDate,
+        "electricalEnergy": item['value']
+      };
+    }).toList();
+
+    print("dayDeviceList: $dayDeviceList");
+    return dayDeviceList;
+  } else {
+    return [];
+  }
+}
+
 
 // List<Map<String, dynamic>> getMonthEData() {
 //   ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -154,17 +122,12 @@ List<Map<String, dynamic>> getDayEData() {
 //   }).toList();
 //   return monthList;
 // }
-
 ///월별 전력량 요청
-Future<List<Map<String, dynamic>>> getMonthEData() async {
-  final url = dotenv.get("URL");
-  final storage = FlutterSecureStorage();
-  final accessToken = await storage.read(key: 'ACCESS_TOKEN');
-  final dio = Dio();
-  final response = await dio.get(url + "/usage/month");
+Future<List<Map<String, dynamic>>> getMonthEData(BuildContext context) async {
+  final response = await dioRequest("GET", "/usage/month", context: context);
 
-  if (response.statusCode == 200) {
-    List<dynamic> data = jsonDecode(response.data);
+  if (response?.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response?.data);
     List<Map<String, dynamic>> monthList = data.map((item) {
       return {
         "month": item['date'],
@@ -204,24 +167,12 @@ Future<List<Map<String, dynamic>>> getMonthEData() async {
 // }
 
 ///기기별 전력량 요청
-Future<List<Map<String, dynamic>>> getDeviceEData() async {
-  final url = dotenv.get("URL");
-  final storage = FlutterSecureStorage();
-  final accessToken = await storage.read(key: 'ACCESS_TOKEN');
-  final dio = Dio();
-  final response = await dio.get(url + "/usage/week/groupPlug");
+Future<List<Map<String, dynamic>>> getDeviceEData(BuildContext context) async {
+  final response = await dioRequest("GET", "/usage/week/groupPlug", context: context);
 
-  if (response.statusCode == 200) {
-    List<dynamic> data = jsonDecode(response.data);
+  if (response?.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response?.data);
     print(data);
-
-    // List<Map<String, dynamic>> deviceList = data.skip(1).map((item) {
-    //   return {
-    //     "plugName": item['plugName'],
-    //     "usage": item['usage'],
-    //     "plugId": item['plugId']
-    //   };
-    // }).toList();
     // 첫 번째 항목(메시지)을 제외한 나머지 데이터에서 usage가 0이 아닌 것만 필터링
     List<Map<String, dynamic>> deviceList = data.skip(1).where((item) {
       return item['usage'] != 0; // usage가 0인 데이터는 제외

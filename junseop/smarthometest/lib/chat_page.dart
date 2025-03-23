@@ -14,7 +14,26 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   List<Map<String, String>> _messages = []; // 메시지를 저장할 리스트
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
 
   // 메시지를 전송하고 응답을 처리하는 함수
   void _sendMessage() async {
@@ -25,6 +44,7 @@ class _ChatPageState extends State<ChatPage> {
       _messages.add({'sender': 'user', 'message': message}); // 사용자가 보낸 메시지 추가
     });
     _controller.clear();
+    _scrollToBottom();
 
     // 서버로 메시지 전송
     String response = await sendChat(message);
@@ -33,6 +53,7 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       _messages.add({'sender': 'other', 'message': response}); // 서버 응답 메시지 추가
     });
+    _scrollToBottom();
   }
 
   @override

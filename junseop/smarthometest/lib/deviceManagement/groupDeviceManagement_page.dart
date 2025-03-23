@@ -19,11 +19,18 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
   List<Map<String, dynamic>> _groups = []; // 그룹 목록 저장
   bool isLoading = false; // 로딩 상태를 나타내는 변수
 
+  final TextEditingController _groupNameController = TextEditingController();
   @override
   void initState() {
     super.initState();
     _loadGroups(); // 페이지 초기화 시 그룹 목록 불러오기
-    _loadDevices(); // 페이지 초기화 시 기기 목록 불러오기
+    // _loadDevices(); // 페이지 초기화 시 기기 목록 불러오기
+  }
+
+  @override
+  void dispose() {
+    _groupNameController.dispose(); // 🔹 자원 반납
+    super.dispose();
   }
 
   // ⭐ 그룹 목록 불러오기 ⭐
@@ -33,7 +40,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
     });
 
     // 서버에서 그룹 목록을 가져오는 비동기 요청
-    var groups = await getGroupList();
+    var groups = await getGroupList(context);
     setState(() {
       _groups = groups;
       isLoading = false; // 데이터 로딩 완료 후 로딩 상태 비활성화
@@ -43,7 +50,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
   // ⭐ 기기 목록 불러오기 ⭐
   Future<void> _loadDevices() async {
     // 서버에서 기기 목록을 가져오는 비동기 요청
-    var devices = await getDeviceList();
+    var devices = await getDeviceList(context);
     setState(() {
       _devices = devices;
     });
@@ -51,48 +58,76 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
 
   //⭐ 그룹 이름 추가 ⭐
   void _createGroupName() async {
-    TextEditingController groupNameController = TextEditingController();
+    _groupNameController.clear();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("그룹 이름 추가"),
-          content: TextField(
-            controller: groupNameController,
-            decoration: const InputDecoration(labelText: "그룹 이름"),
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 5,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("그룹 추가", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 15),
+                TextField(
+                  controller: _groupNameController,
+                  decoration: InputDecoration(
+                    labelText: "그룹 이름",
+                    labelStyle: const TextStyle(fontSize: 16, color: Colors.black54),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text("취소", style: TextStyle(color: Colors.black)),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final groupName = _groupNameController.text.trim();
+                        if (groupName.isEmpty) {
+                          showToast("그룹명을 입력하세요.");
+                          return;
+                        }
+                        await createGroup(context, groupName);
+                        await _loadGroups();
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text("확인", style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
-              },
-              child: const Text("취소"),
-            ),
-            TextButton(
-              onPressed: () async {
-                String groupName = groupNameController.text.trim();
-
-                if (groupName.isEmpty) {
-                  showToast("그룹명을 입력하세요.");
-                  return;
-                }
-
-                print("그룹이름 요청할게");
-                await createGroup(groupName);
-
-                // 그룹 추가 후 목록 갱신
-                await _loadGroups();
-
-                Navigator.pop(context);
-              },
-              child: const Text("확인"),
-            ),
-          ],
         );
       },
     );
   }
+
+
 
   // ⭐ 그룹 액션 추가 Dialog ⭐
   void _showAddGroupDialog(groupId) async {
@@ -140,9 +175,10 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                     Column(
                       children: _devices.map((device) {
                         return Card(
+                          elevation: 3,
                           margin: const EdgeInsets.symmetric(vertical: 5),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                             side: BorderSide(color: Colors.grey.withOpacity(0.3)),
                           ),
                           child: ListTile(
@@ -181,12 +217,22 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
               ),
               actions: [
                 // 취소 버튼
-                TextButton(
+                ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("취소", style: TextStyle(fontSize: 16, color: Colors.red)),
+                  child: const Text("취소", style: TextStyle(fontSize: 16, color: Colors.black)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
                 ),
                 // 확인 버튼
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
                   onPressed: () async {
                     // 선택된 기기 목록 저장
                     List<Map<String, dynamic>> selectedDevices = _devices
@@ -212,11 +258,11 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                       print(groupData); // 디버깅용 출력
                     });
 
-                    await groupAction(groupData);
+                    await groupAction(context, groupData);
 
                     Navigator.pop(context);
                   },
-                  child: const Text("확인", style: TextStyle(fontSize: 16)),
+                  child: const Text("확인", style: TextStyle(color: Colors.white)),
                 )
               ],
             );
@@ -242,12 +288,20 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("그룹 관리"),
-        toolbarHeight: 35.0,
+        // title: const Text("그룹 관리", style: TextStyle(fontWeight: FontWeight.bold)),
+        toolbarHeight: 50.0,
+        automaticallyImplyLeading: false,
+        // backgroundColor: Colors.blueAccent, // 앱바 색상
+        centerTitle: true, // 제목 중앙 정렬
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _createGroupName,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FloatingActionButton(
+              onPressed: _createGroupName,
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              foregroundColor: Theme.of(context).colorScheme.onSecondary,
+              child: const Icon(Icons.add, size: 30),
+            ),
           ),
         ],
       ),
@@ -268,7 +322,8 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                 .every((device) => device['power'] == true);
 
             return Card(
-              margin: const EdgeInsets.all(5),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 3,
               child: ListTile(
                 title: Text(group['groupName']),
                 trailing: Row(
@@ -283,11 +338,11 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                     ),
                     IconButton(
                         onPressed: () async {
-                          await groupDelete(_groups[index]["groupId"]);
+                          await groupDelete(context, _groups[index]["groupId"]);
                           await _loadGroups();
                         }, icon: const Icon(Icons.delete)),
                     IconButton(onPressed: () {
-                      groupActionRun(_groups[index]["groupId"]);
+                      groupActionRun(context, _groups[index]["groupId"]);
                     },
                         icon: const Icon(Icons.play_arrow)),
                     // ElevatedButton(
@@ -307,7 +362,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                 ),
                 onTap: () async {
                   // groupActionCheck 결과 받아오기
-                  List<Map<String, dynamic>> groupAction = await groupActionCheck(_groups[index]["groupId"]);
+                  List<Map<String, dynamic>> groupAction = await groupActionCheck(context, _groups[index]["groupId"]);
 
                   // 다이얼로그 표시
                   showDialog(

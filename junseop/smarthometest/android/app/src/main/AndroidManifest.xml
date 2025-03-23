@@ -1,124 +1,121 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.smarthometest"> <!-- 본인 패키지로 교체 -->
+
+    <!-- ✅ 추가: Android 13 이상 알림 권한 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!--        android:name="${applicationName}"-->
+    <!--        android:label="smarthometest"-->
     <application
-        android:label="smarthometest"
-        android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
 
-        <activity
-            android:name="com.kakao.sdk.flutter.AppsHandlerActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:hardwareAccelerated="true">
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                    <!-- 배송지 피커를 위한 설정 -->
-<!--                <data android:scheme="kakao" />-->
-                <data android:scheme="@string/kakao_app_key" />
-<!--                <data android:scheme="@string/kakao_app_key" android:host="oauth"/>-->
-<!--                <data android:scheme="kakao${네이티브 키}" />-->
-                <data android:host="address" />
-            </intent-filter>
-        </activity>
+        <!-- 카카오 SDK 앱키 설정 -->
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key" />
 
-
+        <!-- 메인 액티비티 -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:taskAffinity=""
-            android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
+            android:theme="@style/NormalTheme"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:windowSoftInputMode="adjustResize">
-            <!-- Specifies an Android theme to apply to this Activity as soon as
-                 the Android process has started. This theme is visible to the user
-                 while the Flutter UI initializes. After that, this theme continues
-                 to determine the Window background behind the Flutter UI. -->
+
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity> <!-- 🔴 이 태그가 없으면 XML 에러 발생 -->
+
+        <!-- ✅ 필수 액티비티 추가! -->
+        <activity
+            android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:scheme="${kakao_app_key}"
+                    android:host="oauth"/>
             </intent-filter>
         </activity>
-        <!-- Don't delete the meta-data below.
-             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+
+        <!-- Flutter embedding 메타데이터 -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-    </application>
-    <!-- Required to query activities that can process text, see:
-         https://developer.android.com/training/package-visibility and
-         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
 
-         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
-<!--    인터넷 권한-->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.PROCESS_TEXT"/>
-            <data android:mimeType="text/plain"/>
-        </intent>
-    </queries>
+    </application>
+
 </manifest>
 
 
-<!--<manifest xmlns:android="http://schemas.android.com/apk/res/android">-->
-<!--    <application-->
-<!--        android:label="smarthometest"-->
-<!--        android:name="${applicationName}"-->
-<!--        android:icon="@mipmap/ic_launcher">-->
 
-<!--        &lt;!&ndash; 카카오 SDK 설정 &ndash;&gt;-->
-<!--        <meta-data-->
-<!--            android:name="com.kakao.sdk.AppKey"-->
-<!--            android:value="@string/kakao_app_key"/>  &lt;!&ndash; res/values/strings.xml에 정의 &ndash;&gt;-->
+    <!--<manifest xmlns:android="http://schemas.android.com/apk/res/android">-->
+    <!--    <application-->
+    <!--        android:label="smarthometest"-->
+    <!--        android:name="${applicationName}"-->
+    <!--        android:icon="@mipmap/ic_launcher">-->
 
-<!--        <activity-->
-<!--            android:name=".MainActivity"-->
-<!--            android:exported="true"-->
-<!--            android:launchMode="singleTop"-->
-<!--            android:taskAffinity=""-->
-<!--            android:theme="@style/LaunchTheme"-->
-<!--            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"-->
-<!--            android:hardwareAccelerated="true"-->
-<!--            android:windowSoftInputMode="adjustResize">-->
-<!--            <meta-data-->
-<!--                android:name="io.flutter.embedding.android.NormalTheme"-->
-<!--                android:resource="@style/NormalTheme"-->
-<!--                />-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN"/>-->
-<!--                <category android:name="android.intent.category.LAUNCHER"/>-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
+    <!--        &lt;!&ndash; 카카오 SDK 설정 &ndash;&gt;-->
+    <!--        <meta-data-->
+    <!--            android:name="com.kakao.sdk.AppKey"-->
+    <!--            android:value="@string/kakao_app_key"/>  &lt;!&ndash; res/values/strings.xml에 정의 &ndash;&gt;-->
 
-<!--        &lt;!&ndash; 카카오 로그인 처리 &ndash;&gt;-->
-<!--        <activity android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"-->
-<!--            android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.VIEW"/>-->
-<!--                <category android:name="android.intent.category.DEFAULT"/>-->
-<!--                <category android:name="android.intent.category.BROWSABLE"/>-->
-<!--                <data android:scheme="kakaoYOUR_NATIVE_APP_KEY"/>  &lt;!&ndash; YOUR_NATIVE_APP_KEY를 네이티브 앱 키로 변경 &ndash;&gt;-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
+    <!--        <activity-->
+    <!--            android:name=".MainActivity"-->
+    <!--            android:exported="true"-->
+    <!--            android:launchMode="singleTop"-->
+    <!--            android:taskAffinity=""-->
+    <!--            android:theme="@style/LaunchTheme"-->
+    <!--            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"-->
+    <!--            android:hardwareAccelerated="true"-->
+    <!--            android:windowSoftInputMode="adjustResize">-->
+    <!--            <meta-data-->
+    <!--                android:name="io.flutter.embedding.android.NormalTheme"-->
+    <!--                android:resource="@style/NormalTheme"-->
+    <!--                />-->
+    <!--            <intent-filter>-->
+    <!--                <action android:name="android.intent.action.MAIN"/>-->
+    <!--                <category android:name="android.intent.category.LAUNCHER"/>-->
+    <!--            </intent-filter>-->
+    <!--        </activity>-->
 
-<!--        &lt;!&ndash; Don't delete the meta-data below.-->
-<!--             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java &ndash;&gt;-->
-<!--        <meta-data-->
-<!--            android:name="flutterEmbedding"-->
-<!--            android:value="2" />-->
-<!--    </application>-->
+    <!--        &lt;!&ndash; 카카오 로그인 처리 &ndash;&gt;-->
+    <!--        <activity android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"-->
+    <!--            android:exported="true">-->
+    <!--            <intent-filter>-->
+    <!--                <action android:name="android.intent.action.VIEW"/>-->
+    <!--                <category android:name="android.intent.category.DEFAULT"/>-->
+    <!--                <category android:name="android.intent.category.BROWSABLE"/>-->
+    <!--                <data android:scheme="kakaoYOUR_NATIVE_APP_KEY"/>  &lt;!&ndash; YOUR_NATIVE_APP_KEY를 네이티브 앱 키로 변경 &ndash;&gt;-->
+    <!--            </intent-filter>-->
+    <!--        </activity>-->
 
-<!--    &lt;!&ndash; Required to query activities that can process text &ndash;&gt;-->
-<!--    <queries>-->
-<!--        <intent>-->
-<!--            <action android:name="android.intent.action.PROCESS_TEXT"/>-->
-<!--            <data android:mimeType="text/plain"/>-->
-<!--        </intent>-->
-<!--    </queries>-->
-<!--</manifest>-->
+    <!--        &lt;!&ndash; Don't delete the meta-data below.-->
+    <!--             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java &ndash;&gt;-->
+    <!--        <meta-data-->
+    <!--            android:name="flutterEmbedding"-->
+    <!--            android:value="2" />-->
+    <!--    </application>-->
+
+    <!--    &lt;!&ndash; Required to query activities that can process text &ndash;&gt;-->
+    <!--    <queries>-->
+    <!--        <intent>-->
+    <!--            <action android:name="android.intent.action.PROCESS_TEXT"/>-->
+    <!--            <data android:mimeType="text/plain"/>-->
+    <!--        </intent>-->
+    <!--    </queries>-->
+    <!--</manifest>-->
