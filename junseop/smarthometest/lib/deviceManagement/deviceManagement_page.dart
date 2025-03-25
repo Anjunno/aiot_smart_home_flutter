@@ -143,6 +143,7 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
                   final isOnline = device['online'];
 
                   return Card(
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 3,
                     child: ListTile(

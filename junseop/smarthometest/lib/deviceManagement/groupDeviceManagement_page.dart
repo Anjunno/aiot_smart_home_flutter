@@ -355,6 +355,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                 .every((device) => device['power'] == true);
 
             return Card(
+              color: Theme.of(context).colorScheme.surfaceContainer,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               elevation: 3,
               child: ListTile(
@@ -407,7 +408,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         title: Row(
                           children: [
-                            Icon(Icons.devices, color: Colors.blue),
+                            Icon(Icons.devices, color: Theme.of(context).colorScheme.secondary,),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
