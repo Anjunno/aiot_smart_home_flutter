@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:smarthometest/request/group_request.dart';
 import 'package:smarthometest/toastMessage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -19,17 +20,31 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
   List<Map<String, dynamic>> _groups = []; // 그룹 목록 저장
   bool isLoading = false; // 로딩 상태를 나타내는 변수
 
+  bool _showFab = true;
+  late ScrollController _scrollController;
+
+
   final TextEditingController _groupNameController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    _loadGroups(); // 페이지 초기화 시 그룹 목록 불러오기
-    // _loadDevices(); // 페이지 초기화 시 기기 목록 불러오기
+    _loadGroups();
+
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+        if (_showFab) setState(() => _showFab = false);
+      } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+        if (!_showFab) setState(() => _showFab = true);
+      }
+    });
   }
+
 
   @override
   void dispose() {
-    _groupNameController.dispose(); // 🔹 자원 반납
+    _groupNameController.dispose();
+    _scrollController.dispose(); // 🔹 꼭 메모리 해제해 주세요!
     super.dispose();
   }
 
@@ -73,6 +88,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text("그룹 추가", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text("그룹으로 사용할 이름을 추가해주세요. ", style: TextStyle(fontSize: 16, color: Colors.grey)),
                 const SizedBox(height: 15),
                 TextField(
                   controller: _groupNameController,
@@ -162,7 +178,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text("그룹 추가", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              title: const Text("그룹 설정", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               content: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +200,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                           child: ListTile(
                             contentPadding: const EdgeInsets.all(10),
                             title: Text(device['name'], style: const TextStyle(fontSize: 16)),
-                            subtitle: Text('ID: ${device['id']}', style: const TextStyle(color: Colors.grey)),
+                            subtitle: Text('ID: ${device['id']}', style: const TextStyle(color: Colors.grey, fontSize: 9)),
                             leading: Checkbox(
                               value: deviceSelection[device['id']],
                               onChanged: (bool? value) {
@@ -286,25 +302,41 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
 
   @override
   Widget build(BuildContext context) {
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     // title: const Text("그룹 관리", style: TextStyle(fontWeight: FontWeight.bold)),
+    //     toolbarHeight: 50.0,
+    //     automaticallyImplyLeading: false,
+    //     // backgroundColor: Colors.blueAccent, // 앱바 색상
+    //     centerTitle: true, // 제목 중앙 정렬
+    //     actions: [
+    //       Padding(
+    //         padding: const EdgeInsets.all(8.0),
+    //         child: FloatingActionButton(
+    //           onPressed: _createGroupName,
+    //           backgroundColor: Theme.of(context).colorScheme.secondary,
+    //           foregroundColor: Theme.of(context).colorScheme.onSecondary,
+    //           child: const Icon(Icons.add, size: 30),
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+
     return Scaffold(
-      appBar: AppBar(
-        // title: const Text("그룹 관리", style: TextStyle(fontWeight: FontWeight.bold)),
-        toolbarHeight: 50.0,
-        automaticallyImplyLeading: false,
-        // backgroundColor: Colors.blueAccent, // 앱바 색상
-        centerTitle: true, // 제목 중앙 정렬
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FloatingActionButton(
-              onPressed: _createGroupName,
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              foregroundColor: Theme.of(context).colorScheme.onSecondary,
-              child: const Icon(Icons.add, size: 30),
-            ),
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   toolbarHeight: 50.0,
+      //   automaticallyImplyLeading: false,
+      //   centerTitle: true,
+      // ),
+      floatingActionButton: _showFab
+          ? FloatingActionButton(
+        onPressed: _createGroupName,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        foregroundColor: Theme.of(context).colorScheme.onSecondary,
+        child: const Icon(Icons.add),
+      )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: RefreshIndicator(
         onRefresh: () async {
           await _loadGroups();
@@ -315,6 +347,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
             : _groups.isEmpty
             ? const Center(child: Text('등록된 그룹이 없습니다.'))
             : ListView.builder(
+          controller: _scrollController,
           itemCount: _groups.length,
           itemBuilder: (context, index) {
             final group = _groups[index];
@@ -338,7 +371,9 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                     ),
                     IconButton(
                         onPressed: () async {
+                          String groupName = _groups[index]["groupName"];
                           await groupDelete(context, _groups[index]["groupId"]);
+                          // showToast("$groupName 이(가) 삭제되었습니다.");
                           await _loadGroups();
                         }, icon: const Icon(Icons.delete)),
                     IconButton(onPressed: () {
@@ -411,7 +446,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                                               subtitle: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text('Plug ID: ${plug["plugId"]}'),
+                                                  Text('Plug ID: ${plug["plugId"]}', style: TextStyle(fontSize: 10),),
                                                   Row(
                                                     children: [
                                                       Text(
@@ -450,10 +485,16 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                           ),
                         ),
                         actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('닫기', style: TextStyle(fontWeight: FontWeight.bold)),
+
+                          ElevatedButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.secondary,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: const Text("닫기", style: TextStyle(color: Colors.white)),
                           ),
+
                         ],
                       );
                     },

@@ -15,8 +15,11 @@ Future<List<Map<String, dynamic>>> getDayEData(BuildContext context) async{
 
   if (response?.statusCode == 200) {
     List<dynamic> data = jsonDecode(response?.data);
-    List<Map<String, dynamic>> dayList = data.map((item) {
 
+    // 날짜기준 오름차순
+    data.sort((a, b) => a['date'].compareTo(b['date']));
+
+    List<Map<String, dynamic>> dayList = data.map((item) {
       List<String> dateParts = item['date'].split('-');
       String formattedDate = "${int.parse(dateParts[1])}/${int.parse(dateParts[2])}";
 
@@ -26,8 +29,9 @@ Future<List<Map<String, dynamic>>> getDayEData(BuildContext context) async{
       };
     }).toList();
 
-    print("dayList: $dayList");
+    print("Filtered dayList: $dayList");
     return dayList;
+
   } else {
     return [];
   }
@@ -41,6 +45,11 @@ Future<List<Map<String, dynamic>>> getDayDeviceEData(BuildContext context, Strin
     print("오케이");
     print(response);
     List<dynamic> data = jsonDecode(response?.data);
+
+    // 날짜기준 오름차순
+    data.sort((a, b) => DateTime.parse(a['t']).compareTo(DateTime.parse(b['t'])));
+
+
     List<Map<String, dynamic>> dayDeviceList = data.map((item) {
       // "t"는 "2025-03-14 00:00:00" 형식으로 되어있으므로 DateTime으로 변환
       DateTime dateTime = DateTime.parse(item['t']);

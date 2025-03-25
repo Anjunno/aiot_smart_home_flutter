@@ -10,7 +10,7 @@ import 'package:smarthometest/onboarding_page.dart';
 import 'package:smarthometest/outing_page.dart';
 import 'package:smarthometest/providers/kakao_user_provider.dart';
 import 'package:smarthometest/providers/user_provider.dart';
-import 'package:smarthometest/pushTest.dart';
+import 'package:smarthometest/pushNotificationLog.dart';
 import 'package:smarthometest/toastMessage.dart';
 
 import 'deviceManagement/deviceManagementMain_page.dart';
@@ -231,7 +231,7 @@ class _TabPageState extends State<TabPage> {
                 color: colorScheme.onSurface,
               ),
               title: Text(
-                '푸시알림',
+                '푸시알림 내역',
                 style: TextStyle(
                     color: colorScheme.onSurface,
                     fontSize: 16,
@@ -239,7 +239,7 @@ class _TabPageState extends State<TabPage> {
               ),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.pushNamed(context, PushTest.routeName);
+                Navigator.pushNamed(context, PushNotificationLog.routeName);
               },
             ),
             ListTile(

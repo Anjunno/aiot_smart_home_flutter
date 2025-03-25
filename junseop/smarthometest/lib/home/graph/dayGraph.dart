@@ -98,15 +98,38 @@ class _DayGraphState extends State<DayGraph> {
   @override
   Widget build(BuildContext context) {
     double maxEnergy = _data.isNotEmpty
-        ? _data.fold(0.0, (prev, e) {
-      double val;
-      if (e.containsKey("value")) {
-        val = (e["value"] as num).toDouble();
-      } else {
-        val = (e["electricalEnergy"] as num).toDouble();
-      }
-      return prev > val ? prev : val;
-    }) + 5
+        ? (() {
+      double maxVal = _data.fold(0.0, (prev, e) {
+        double val;
+        if (e.containsKey("value")) {
+          val = (e["value"] as num).toDouble();
+        } else {
+          val = (e["electricalEnergy"] as num).toDouble();
+        }
+        return val > prev ? val : prev;
+      });
+
+      double minVal = _data.fold(maxVal, (prev, e) {
+        double val;
+        if (e.containsKey("value")) {
+          val = (e["value"] as num).toDouble();
+        } else {
+          val = (e["electricalEnergy"] as num).toDouble();
+        }
+        return val < prev ? val : prev;
+      });
+
+      // 변화폭 계산
+      double diff = maxVal - minVal;
+
+      // 마진: 변화폭이 작을수록 더 크게 부여
+      double margin = diff == 0
+          ? maxVal == 0 ? 10.0 : maxVal * 0.2
+          : diff * 0.2;
+
+      // 최종 maxY 설정
+      return (maxVal + margin) < 1.0 ? 1.0 : maxVal + margin;
+    })()
         : 10.0;
 
     double horizontalInterval = maxEnergy / 5;
@@ -122,7 +145,7 @@ class _DayGraphState extends State<DayGraph> {
                   : _data.isEmpty
                   ? const Center(
                 child: Text(
-                  "사용한 전력이 없습니다",
+                  "최근 일주일간 사용한 전력이 없습니다",
                   style: TextStyle(fontSize: 16),
                 ),
               )

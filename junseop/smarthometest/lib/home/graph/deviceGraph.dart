@@ -122,7 +122,7 @@ class _DeviceGraphState extends State<DeviceGraph> {
         : energyData.isEmpty
         ? const Center(
       child: Text(
-        "사용한 전력이 없습니다",
+        "최근 일주일간 사용한 전력이 없습니다",
         style: TextStyle(fontSize: 16),
       ),
     )

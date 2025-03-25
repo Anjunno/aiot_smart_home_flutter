@@ -20,7 +20,12 @@ Future<void> kakaoLogin(String acccessToken) async {
   final url = dotenv.get("URL");
   final storage = FlutterSecureStorage();
   final dio = Dio();
-  final response = await dio.get(url + "/kakao/flutter?accessToken=" + acccessToken);
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print('📱 FCM Token: $fcmToken');
+  final data = {
+    'fcmKey': fcmToken,
+  };
+  final response = await dio.get(url + "/kakao/flutter?accessToken=" + acccessToken, data: data);
 
 
   if (response.statusCode == 200) {

@@ -152,6 +152,7 @@ Future<void> createGroup(BuildContext context, String groupName) async {
   final response = await dioRequest("POST", "/group/create", data: {"groupName": "$groupName 그룹"}, context: context);
   if (response?.statusCode == 200) {
     print("그룹 생성 성공: $groupName");
+    showToast("그룹 생성 완료", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT);
   } else {
     print("그룹 생성 실패: ${response?.statusCode ?? '네트워크 오류'}");
   }
@@ -176,6 +177,7 @@ Future<void> groupAction(BuildContext context, Map<String, dynamic> groupData) a
 
   if (response?.statusCode == 200) {
     print("그룹 액션 추가 성공: $groupData");
+    showToast("그룹 설정 완료", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT);
   } else {
     print("그룹 액션 추가 실패: ${response?.statusCode ?? '네트워크 오류'}");
   }
@@ -341,6 +343,7 @@ Future<void> groupActionRun(BuildContext context, int groupId) async {
 //     return [];
 //   }
 // }
+///기기 리스트 요청
 Future<List<Map<String, dynamic>>> getDeviceList(BuildContext context) async {
   final response = await dioRequest("GET", "/check/plugList", context: context);
 
@@ -372,5 +375,5 @@ Future<void> groupDelete(BuildContext context, int groupId) async {
   // final responseData = response.data is String ? jsonDecode(response.data) : response.data;
 
 
-  showToast("그룹 삭제 완료", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_LONG);
+  showToast("그룹 삭제 완료", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT);
 }

@@ -7,7 +7,7 @@ import 'package:smarthometest/main_page.dart';
 import 'package:smarthometest/onboarding_page.dart';
 import 'package:smarthometest/providers/kakao_user_provider.dart';
 import 'package:smarthometest/providers/user_provider.dart';
-import 'package:smarthometest/pushTest.dart';
+import 'package:smarthometest/pushNotificationLog.dart';
 
 import 'deviceManagement/deviceManagement_page.dart';
 import 'deviceManagement/groupDeviceManagement_page.dart';
@@ -129,7 +129,7 @@ class MyApp extends StatelessWidget {
             MainPage.routeName: (context) => MainPage(),
             GraphMainPage.routeName: (context) => GraphMainPage(),
             OnboardingPage.routeName: (context) => OnboardingPage(),
-            PushTest.routeName: (context) => PushTest(),
+            PushNotificationLog.routeName: (context) => PushNotificationLog(),
           },
         );
       },
