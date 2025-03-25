@@ -64,6 +64,13 @@ void main() async {
     javaScriptAppKey: dotenv.get("JAVASCRIPT_APP_KEY"),
   );
 
+  // SharedPreferences 초기화
+  final prefs = await SharedPreferences.getInstance();
+  final isDarkMode = prefs.getBool('is_dark_mode') ?? false;
+
+  // themeNotifier 초기값 설정
+  MyApp.themeNotifier.value = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+
   // ✅ 알림 초기화
   const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
   const initSettings = InitializationSettings(android: androidInit);

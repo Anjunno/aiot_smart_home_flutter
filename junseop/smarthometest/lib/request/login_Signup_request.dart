@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -119,9 +120,13 @@ Future<bool> login(BuildContext context, String userId, String userPassword) asy
   final storage = FlutterSecureStorage();
   final dio = Dio();
 
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print('📱 FCM Token: $fcmToken');
+
   final data = {
     'userId': userId,
     'userPassword': userPassword,
+    'fcmKey' : fcmToken,
   };
 
   try {

@@ -80,23 +80,32 @@ class _LoginPageState extends State<LoginPage> {
 
       // 화면에 로그인 완료 후, 원하는 페이지로 이동
       if (mounted) {
-        // await kakaoLogin(token.accessToken);
         // ✅ Provider에 유저 정보 저장
         Provider.of<KaKaoUserProvider>(context, listen: false).setUser(user);
 
-        // Navigator.pushNamedAndRemoveUntil(
-        //   context,
-        //   TabPage.routeName,
-        //       (route) => false,
-        // );
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          OnboardingPage.routeName,
-              (route) => false,
-        );
+        // ✅ 온보딩 여부 확인
+        final prefs = await SharedPreferences.getInstance();
+        final onboardingDone = prefs.getBool('onboarding_done') ?? false;
+
+        if (onboardingDone) {
+          // 이미 온보딩 본 경우 → TabPage로 이동
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            TabPage.routeName,
+                (route) => false,
+          );
+        } else {
+          // 아직 온보딩 안 본 경우 → 온보딩 페이지로 이동
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            OnboardingPage.routeName,
+                (route) => false,
+          );
+        }
 
         showToast("카카오 로그인 완료: ${user.kakaoAccount?.profile?.nickname}");
       }
+
     } catch (e) {
       print("카카오 로그인 실패(예상치 못한 오류): $e");  // 예상치 못한 오류 출력
       showToast("카카오 로그인 실패: ${e.toString()}");  // 사용자에게 오류 메시지 토스트로 표시
@@ -206,6 +215,7 @@ class _LoginPageState extends State<LoginPage> {
                               if (await login(context, email, password)) {
                                 final prefs = await SharedPreferences.getInstance();
                                 final onboardingDone = prefs.getBool('onboarding_done') ?? false;
+                                print(onboardingDone);
 
                                 if (onboardingDone) {
                                   // 온보딩 이미 봤으면 메인 페이지로

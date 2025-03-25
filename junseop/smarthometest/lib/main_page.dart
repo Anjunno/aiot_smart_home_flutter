@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart'; // fl_chart 패키지 import
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart'; // fl_chart 패키지 import
 
 class MainPage extends StatefulWidget {
   static String routeName = "/MainPage";
@@ -57,6 +58,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _buildElectricityCostSection() {
+    final formatter = NumberFormat('#,###');
     // 예시 데이터 (실제 데이터로 교체)
     double estimatedElectricityCost = 15000.00; // 예상 전기요금
     double actualElectricityUsage = 350; // 실제 사용량 (kWh)
@@ -86,7 +88,7 @@ class _MainPageState extends State<MainPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                "₩${estimatedElectricityCost.toStringAsFixed(2)}",
+                "₩${formatter.format(estimatedElectricityCost)}",
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -234,6 +236,7 @@ class _MainPageState extends State<MainPage> {
 
   ///전기먹는 하마
   Widget _buildPowerConsumingDeviceSection() {
+    final formatter = NumberFormat('#,###'); // 쉼표 포맷 생성
     return Container(
       padding: const EdgeInsets.all(16),
       width: double.infinity,
@@ -272,23 +275,25 @@ class _MainPageState extends State<MainPage> {
           SizedBox(height: 10),
           _buildPowerUsagePieChart(),
           Text(
-            "$mostPowerConsumingDevice",
+            mostPowerConsumingDevice,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Colors.black.withOpacity(0.8),
             ),
           ),
+
           SizedBox(height: 10),
           Row(
             children: [
               Text(
-                "₩${mostPowerConsumingDeviceCost.toStringAsFixed(2)}",
+                "₩${formatter.format(mostPowerConsumingDeviceCost)}",
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               SizedBox(width: 10),
               Text(
                 "/ ${mostPowerConsumingDeviceUsage.toStringAsFixed(2)} kWh",
