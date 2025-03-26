@@ -144,12 +144,21 @@ class _DayGraphState extends State<DayGraph> {
                   ? const Center(child: CircularProgressIndicator())
                   : _data.isEmpty
                   ? const Center(
-                child: Text(
-                  "최근 일주일간 사용한 전력이 없습니다",
-                  style: TextStyle(fontSize: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.show_chart, size: 48, color: Colors.grey),
+                    SizedBox(height: 12),
+                    Text(
+                      "최근 일주일간 사용한 전력이 없습니다",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               )
-                  : Padding(
+
+        : Padding(
                 padding: const EdgeInsets.fromLTRB(8, 16, 16, 16),
                 child: LineChart(
                   LineChartData(

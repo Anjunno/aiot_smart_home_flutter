@@ -56,7 +56,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
         showBackButton: true,
         back: const Icon(Icons.arrow_back),
         next: const Icon(Icons.arrow_forward),
-        done: const Text('시작하기', style: TextStyle(fontWeight: FontWeight.bold)),
+        done: Row(
+          children: const [
+            Icon(Icons.check),
+            SizedBox(width: 4),
+            Text('시작하기', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
         dotsDecorator: DotsDecorator(
           size: const Size(8.0, 8.0),
           activeSize: const Size(16.0, 8.0),

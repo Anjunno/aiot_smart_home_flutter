@@ -77,5 +77,6 @@ Future<List<Map<String, dynamic>>> getPushNotificationLog(BuildContext context) 
     }
   ];
 
-  return data;
+  // return data;
+  return [];
 }

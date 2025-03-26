@@ -190,40 +190,42 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                     // 기기 목록 출력 및 선택
                     Column(
                       children: _devices.map((device) {
-                        return Card(
-                          elevation: 3,
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: Colors.grey.withOpacity(0.3)),
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(10),
-                            title: Text(device['name'], style: const TextStyle(fontSize: 16)),
-                            subtitle: Text('ID: ${device['id']}', style: const TextStyle(color: Colors.grey, fontSize: 9)),
-                            leading: Checkbox(
-                              value: deviceSelection[device['id']],
-                              onChanged: (bool? value) {
+                        return InkWell(
+                          child: Card(
+                            elevation: 3,
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(10),
+                              title: Text(device['name'], style: const TextStyle(fontSize: 16)),
+                              subtitle: Text('ID: ${device['id']}', style: const TextStyle(color: Colors.grey, fontSize: 9)),
+                              leading: Checkbox(
+                                value: deviceSelection[device['id']],
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    deviceSelection[device['id']] = value ?? false;
+                                  });
+                                },
+                              ),
+                              trailing: Switch(
+                                value: deviceState[device['id']] == "on",
+                                onChanged: deviceSelection[device['id']]!
+                                    ? (bool value) {
+                                  setState(() {
+                                    deviceState[device['id']] = value ? "on" : "off";
+                                  });
+                                }
+                                    : null, // 체크 안된 기기는 비활성화
+                              ),
+                              onTap: () {
                                 setState(() {
-                                  deviceSelection[device['id']] = value ?? false;
+                                  deviceSelection[device['id']] = !deviceSelection[device['id']]!;
                                 });
                               },
                             ),
-                            trailing: Switch(
-                              value: deviceState[device['id']] == "on",
-                              onChanged: deviceSelection[device['id']]!
-                                  ? (bool value) {
-                                setState(() {
-                                  deviceState[device['id']] = value ? "on" : "off";
-                                });
-                              }
-                                  : null, // 체크 안된 기기는 비활성화
-                            ),
-                            onTap: () {
-                              setState(() {
-                                deviceSelection[device['id']] = !deviceSelection[device['id']]!;
-                              });
-                            },
                           ),
                         );
                       }).toList(),
@@ -345,8 +347,19 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
             : _groups.isEmpty
-            ? const Center(child: Text('등록된 그룹이 없습니다.'))
-            : ListView.builder(
+            ?  const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.group_off, size: 48, color: Colors.grey),
+              SizedBox(height: 12),
+              Text('등록된 그룹이 없습니다.', style: TextStyle(fontSize: 16, color: Colors.grey),
+          ),
+        ],
+      ),
+    )
+
+    : ListView.builder(
           controller: _scrollController,
           itemCount: _groups.length,
           itemBuilder: (context, index) {

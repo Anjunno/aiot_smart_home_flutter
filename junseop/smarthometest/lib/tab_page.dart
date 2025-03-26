@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:smarthometest/chat_page.dart';
@@ -76,21 +77,67 @@ class _TabPageState extends State<TabPage> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
     final kakaoUserProvider = Provider.of<KaKaoUserProvider>(context);
     final kakaoUser = kakaoUserProvider.user;
     final userProvider = Provider.of<UserProvider>(context);
     final user = userProvider.name;
 
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async {
+          final shouldExit = await showDialog<bool>(
+            context: context,
+            barrierColor: Colors.black.withOpacity(0.5), // 🔹 배경 투명도 조절
+            builder: (context) => AlertDialog(
+              title: const Text("앱 종료"),
+              content: const Text("앱을 종료하시겠습니까?"),
+              actionsPadding: const EdgeInsets.only(bottom: 12, right: 12),
+              backgroundColor: Theme.of(context).colorScheme.surface, // 다이얼로그 본문 배경도 커스텀 가능
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text("취소", style: TextStyle(color: Colors.black)),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text("확인", style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+
+      if (shouldExit == true) {
+        SystemNavigator.pop(); // Android 종료
+      }
+
+      return false; // 기본 뒤로가기 동작 막기
+    },child:  Scaffold(
       appBar: AppBar(
         backgroundColor: colorScheme.secondary,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text('SmartHome',
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onSecondary,
-                fontWeight: FontWeight.bold)),
+        // title: Text('Blinked',
+        //     style: TextStyle(
+        //         color: Theme.of(context).colorScheme.onSecondary,
+        //         fontWeight: FontWeight.bold)),
         leading: Builder(builder: (context) {
           return IconButton(
             onPressed: () {
@@ -255,17 +302,56 @@ class _TabPageState extends State<TabPage> {
                     fontWeight: FontWeight.bold),
               ),
               onTap: () async {
-                try {
-                  userProvider.clearUser();
-                  kakaoUserProvider.clearUser();
-                  await Navigator.pushNamedAndRemoveUntil(
-                      context, LoginPage.routeName, (route) => false);
-                  showToast("로그아웃");
-                } catch (e) {
-                  print("로그인 화면 전환 중 오류 발생: $e");
-                  showToast("로그인 중 오류가 발생했습니다.");
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("로그아웃"),
+                    content: const Text("정말 로그아웃하시겠습니까?"),
+                    actions: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text("취소", style: TextStyle(color: Colors.black)),
+                          ),
+                          const SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.secondary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text("확인", style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  try {
+                    // userProvider.clearUser();
+                    // kakaoUserProvider.clearUser();
+                    await Navigator.pushNamedAndRemoveUntil(
+                        context, LoginPage.routeName, (route) => false);
+                    showToast("로그아웃");
+                  } catch (e) {
+                    print("로그인 화면 전환 중 오류 발생: $e");
+                    showToast("로그아웃 중 오류가 발생했습니다.");
+                  }
                 }
               },
+
             ),
           ],
         ),
@@ -283,7 +369,8 @@ class _TabPageState extends State<TabPage> {
           DevicemanagementmainPage(),
         ],
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar:
+      Container(
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(
@@ -313,6 +400,7 @@ class _TabPageState extends State<TabPage> {
           ],
         ),
       ),
+    )
     );
   }
 

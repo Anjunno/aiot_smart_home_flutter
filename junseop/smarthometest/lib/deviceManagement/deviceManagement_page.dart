@@ -128,7 +128,20 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
             } else if (snapshot.hasError) {
               return Center(child: Text('오류 발생: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('등록된 기기가 없습니다.'));
+              return const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.power_off, size: 48, color: Colors.grey),
+                    SizedBox(height: 12),
+                    Text(
+                      '등록된 기기가 없습니다.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              );
+
             } else {
               _devices = snapshot.data!;
 
@@ -142,35 +155,37 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
                   final device = _devices[index];
                   final isOnline = device['online'];
 
-                  return Card(
-                    color: Theme.of(context).colorScheme.surfaceContainer,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 3,
-                    child: ListTile(
-                      leading: const Icon(Icons.devices),
-                      title: Text(device['name']),
-                      subtitle: Row(
-                        children: [
-                          Icon(
-                            isOnline ? Icons.wifi : Icons.wifi_off,
-                            color: isOnline ? Colors.green : Colors.red,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            isOnline ? '온라인' : '오프라인',
-                            style: TextStyle(
+                  return InkWell(
+                    child: Card(
+                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 3,
+                      child: ListTile(
+                        leading: const Icon(Icons.devices),
+                        title: Text(device['name']),
+                        subtitle: Row(
+                          children: [
+                            Icon(
+                              isOnline ? Icons.wifi : Icons.wifi_off,
                               color: isOnline ? Colors.green : Colors.red,
-                              // fontWeight: FontWeight.bold,
+                              size: 20,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Text(
+                              isOnline ? '온라인' : '오프라인',
+                              style: TextStyle(
+                                color: isOnline ? Colors.green : Colors.red,
+                                // fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: Switch(
+                          value: _deviceStates[index],
+                          onChanged: isOnline ? (value) => _toggleDeviceState(index, value) : null, // 비활성화
+                        ),
+                        onTap: () => _showDeviceDialog(device, index),
                       ),
-                      trailing: Switch(
-                        value: _deviceStates[index],
-                        onChanged: (value) => _toggleDeviceState(index, value),
-                      ),
-                      onTap: () => _showDeviceDialog(device, index),
                     ),
                   );
                 },

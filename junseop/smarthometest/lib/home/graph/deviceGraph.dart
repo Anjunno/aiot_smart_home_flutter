@@ -121,9 +121,17 @@ class _DeviceGraphState extends State<DeviceGraph> {
         ? const Center(child: CircularProgressIndicator()) // 로딩 인디케이터 표시
         : energyData.isEmpty
         ? const Center(
-      child: Text(
-        "최근 일주일간 사용한 전력이 없습니다",
-        style: TextStyle(fontSize: 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.insert_chart_outlined, size: 48, color: Colors.grey),
+          SizedBox(height: 12),
+          Text(
+            "최근 일주일간 사용한 전력이 없습니다",
+            style: TextStyle(fontSize: 16, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     )
         : Column(
