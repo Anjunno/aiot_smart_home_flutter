@@ -24,6 +24,11 @@ class _PushNotificationLogState extends State<PushNotificationLog> {
     super.initState();
     _loadLogs();
   }
+  @override
+  void dispose() {
+    super.dispose();
+    _searchController.dispose();
+  }
 
   Future<void> _loadLogs() async {
     setState(() {

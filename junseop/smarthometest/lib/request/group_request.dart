@@ -375,5 +375,5 @@ Future<void> groupDelete(BuildContext context, int groupId) async {
   // final responseData = response.data is String ? jsonDecode(response.data) : response.data;
 
 
-  showToast("그룹 삭제 완료", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT);
+  showToast("그룹이 삭제되었습니다", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT);
 }

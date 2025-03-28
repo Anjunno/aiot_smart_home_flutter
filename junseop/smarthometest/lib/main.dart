@@ -121,9 +121,11 @@ class MyApp extends StatelessWidget {
             ).copyWith(
               primary: Colors.green,
               // 카드 등 기본 배경
-              surface: Colors.white,
+              // surface: Colors.white,
+              surface: Color(0xFFF0F0F0),
               // onSurface: Colors.black87,
-              surfaceContainer:Color(0xFFF0F0F0),
+              surfaceContainer:Colors.white,
+              // surfaceContainer:Color(0xFFF0F0F0),
               secondary: Color(0x66BB6A),
             ),
             useMaterial3: true, // Material3 적용

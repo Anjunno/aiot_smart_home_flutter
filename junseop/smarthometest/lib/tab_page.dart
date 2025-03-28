@@ -134,7 +134,7 @@ class _TabPageState extends State<TabPage> {
         backgroundColor: colorScheme.surface,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text('kkamppak',
+        title: Text('KKAM PAK',
             style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold)),

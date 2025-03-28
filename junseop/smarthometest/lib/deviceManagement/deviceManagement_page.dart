@@ -61,6 +61,7 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
@@ -97,7 +98,7 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text("확인", style: TextStyle(color: Colors.white)),
+              child:  Text("확인", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
             ),
           ],
         );
@@ -153,47 +154,85 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
                 _deviceStates = _devices.map((device) => device['power'] == true).toList();
               }
 
-              return ListView.builder(
+              return GridView.builder(
+                padding: const EdgeInsets.all(8),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 두 줄로 만들기
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  childAspectRatio: 1.4, // 카드 비율 조정 (가로 대비 세로)
+                ),
                 itemCount: _devices.length,
                 itemBuilder: (context, index) {
                   final device = _devices[index];
                   final isOnline = device['online'];
 
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
-                    child: InkWell(
-                      child: Card(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 3,
-                        child: ListTile(
-                          leading:  Icon(Icons.devices, color: Theme.of(context).colorScheme.onSurfaceVariant,),
-                          title: Text(device['name'], style: TextStyle(color: Theme.of(context).colorScheme.onSurface),),
-                          subtitle: Row(
-                            children: [
-                              Icon(
-                                isOnline ? Icons.wifi : Icons.wifi_off,
-                                color: isOnline ? Colors.green : Colors.red,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                isOnline ? '온라인' : '오프라인',
+                  return InkWell(
+                    onTap: () => _showDeviceDialog(device, index),
+                    child: Card(
+                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 3,
+                      child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // 상단: 이름 + 아이콘
+                        Row(
+                          children: [
+                            Icon(Icons.devices, size: 20, color: Theme.of(context).colorScheme.primary),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                device['name'],
                                 style: TextStyle(
-                                  color: isOnline ? Colors.green : Colors.red,
-                                  // fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ],
-                          ),
-                          trailing: Switch(
-                            value: _deviceStates[index],
-                            onChanged: isOnline ? (value) => _toggleDeviceState(index, value) : null, // 비활성화
-                          ),
-                          onTap: () => _showDeviceDialog(device, index),
+                            ),
+                          ],
                         ),
-                      ),
+
+                        const Spacer(),
+
+                        // 하단: 상태 + 스위치
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  isOnline ? Icons.wifi : Icons.wifi_off,
+                                  color: isOnline ? Colors.green : Colors.red,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  isOnline ? '온라인' : '오프라인',
+                                  style: TextStyle(
+                                    color: isOnline ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Switch(
+                              value: _deviceStates[index],
+                              onChanged: isOnline ? (value) => _toggleDeviceState(index, value) : null,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
+                  ),
+
+
+                  ),
                   );
                 },
               );
