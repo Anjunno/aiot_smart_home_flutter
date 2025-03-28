@@ -201,6 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4)),
                           ),
@@ -239,9 +240,13 @@ class _LoginPageState extends State<LoginPage> {
                             }
                           },
 
-                          child: const Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
-                            child: Text('로그인', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            child: Text('로그인', style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface
+                            )),
                           ),
                         ),
                       ),
@@ -250,15 +255,21 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4)),
                           ),
                           onPressed: () {
                             Navigator.pushNamed(context, SignUpPage.routeName);
                           },
-                          child: const Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
-                            child: Text('회원가입', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            child: Text('회원가입', style: TextStyle(
+                              fontSize: 16,
+                              fontWeight:
+                              FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            )),
                           ),
                         ),
                       ),

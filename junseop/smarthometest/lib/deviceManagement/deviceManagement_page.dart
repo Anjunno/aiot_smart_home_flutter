@@ -64,7 +64,7 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
-              Icon(Icons.devices, color: Colors.blue),
+              Icon(Icons.devices, color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: 8),
               Expanded(child: Text(device['name'], style: TextStyle(fontWeight: FontWeight.bold))),
             ],
@@ -72,10 +72,10 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildInfoRow(Icons.numbers, '기기 ID', device['id']),
-              _buildInfoRow(Icons.electric_bolt, '현재 전압', '${device['curVoltage']}V'),
-              _buildInfoRow(Icons.power, '현재 전력', '${device['curPower']}W'),
-              _buildInfoRow(Icons.electric_meter, '현재 전류', '${device['curCurrent']}mA'),
+              _buildInfoRow(Icons.numbers, '기기 ID', device['id'], color: Theme.of(context).colorScheme.onSurface),
+              _buildInfoRow(Icons.electric_bolt, '현재 전압', '${device['curVoltage']}V', color: Theme.of(context).colorScheme.onSurface),
+              _buildInfoRow(Icons.power, '현재 전력', '${device['curPower']}W', color: Theme.of(context).colorScheme.onSurface),
+              _buildInfoRow(Icons.electric_meter, '현재 전류', '${device['curCurrent']}mA', color: Theme.of(context).colorScheme.onSurface),
               _buildInfoRow(
                 device['online'] ? Icons.wifi : Icons.wifi_off,
                 '온라인 상태',
@@ -91,9 +91,13 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
             ],
           ),
           actions: [
-            TextButton(
+            ElevatedButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('확인', style: TextStyle(fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text("확인", style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -155,36 +159,39 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
                   final device = _devices[index];
                   final isOnline = device['online'];
 
-                  return InkWell(
-                    child: Card(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 3,
-                      child: ListTile(
-                        leading: const Icon(Icons.devices),
-                        title: Text(device['name']),
-                        subtitle: Row(
-                          children: [
-                            Icon(
-                              isOnline ? Icons.wifi : Icons.wifi_off,
-                              color: isOnline ? Colors.green : Colors.red,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              isOnline ? '온라인' : '오프라인',
-                              style: TextStyle(
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+                    child: InkWell(
+                      child: Card(
+                        color: Theme.of(context).colorScheme.surfaceContainer,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 3,
+                        child: ListTile(
+                          leading:  Icon(Icons.devices, color: Theme.of(context).colorScheme.onSurfaceVariant,),
+                          title: Text(device['name'], style: TextStyle(color: Theme.of(context).colorScheme.onSurface),),
+                          subtitle: Row(
+                            children: [
+                              Icon(
+                                isOnline ? Icons.wifi : Icons.wifi_off,
                                 color: isOnline ? Colors.green : Colors.red,
-                                // fontWeight: FontWeight.bold,
+                                size: 20,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 8),
+                              Text(
+                                isOnline ? '온라인' : '오프라인',
+                                style: TextStyle(
+                                  color: isOnline ? Colors.green : Colors.red,
+                                  // fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          trailing: Switch(
+                            value: _deviceStates[index],
+                            onChanged: isOnline ? (value) => _toggleDeviceState(index, value) : null, // 비활성화
+                          ),
+                          onTap: () => _showDeviceDialog(device, index),
                         ),
-                        trailing: Switch(
-                          value: _deviceStates[index],
-                          onChanged: isOnline ? (value) => _toggleDeviceState(index, value) : null, // 비활성화
-                        ),
-                        onTap: () => _showDeviceDialog(device, index),
                       ),
                     ),
                   );

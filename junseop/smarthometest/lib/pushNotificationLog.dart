@@ -72,9 +72,9 @@ class _PushNotificationLogState extends State<PushNotificationLog> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(), // 화면 터치 시 키보드 내리기
       child: Scaffold(
-        appBar: AppBar(title:  Text("푸시 알림 내역", style: TextStyle(color: Theme.of(context).colorScheme.surface),),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          iconTheme: IconThemeData(color: Theme.of(context).colorScheme.surface,),
+        appBar: AppBar(title:  Text("푸시 알림 내역", style: TextStyle(color: Theme.of(context).colorScheme.onSurface),),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurfaceVariant,),
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -86,7 +86,7 @@ class _PushNotificationLogState extends State<PushNotificationLog> {
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
@@ -184,7 +184,7 @@ class _PushNotificationLogState extends State<PushNotificationLog> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
-                                color: Theme.of(context).colorScheme.secondary,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             const SizedBox(height: 4),

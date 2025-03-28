@@ -66,7 +66,7 @@ class _MainPageState extends State<MainPage> {
     double tierEnd = 400; // 예시: 누진 구간 끝
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       width: double.infinity,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -99,7 +99,7 @@ class _MainPageState extends State<MainPage> {
                 "/ ${actualElectricityUsage.toStringAsFixed(2)} kWh",
                 style: TextStyle(
                   fontSize: 18,
-                  color: Colors.black.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant
                 ),
               ),
             ],
@@ -192,7 +192,7 @@ class _MainPageState extends State<MainPage> {
                         shadows: [
                           Shadow(
                             blurRadius: 4,
-                            color: Colors.black26,
+                            color: Theme.of(context).colorScheme.onSurface,
                             offset: Offset(0, 2),
                           ),
                         ],
@@ -209,19 +209,19 @@ class _MainPageState extends State<MainPage> {
                   children: [
                     Positioned(
                       left: 0,
-                      child: Text('0', style: TextStyle(fontSize: 12)),
+                      child: Text('0', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant,)),
                     ),
                     Positioned(
                       left: tier1Width - 12,
-                      child: Text('300', style: TextStyle(fontSize: 12)),
+                      child: Text('300', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant,)),
                     ),
                     Positioned(
                       left: tier1Width + tier2Width - 12,
-                      child: Text('450', style: TextStyle(fontSize: 12)),
+                      child: Text('450', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant,)),
                     ),
                     Positioned(
                       left: width - 24,
-                      child: Text('600', style: TextStyle(fontSize: 12)),
+                      child: Text('600', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant,)),
                     ),
                   ],
                 ),
@@ -237,74 +237,80 @@ class _MainPageState extends State<MainPage> {
   ///전기먹는 하마
   Widget _buildPowerConsumingDeviceSection() {
     final formatter = NumberFormat('#,###'); // 쉼표 포맷 생성
-    return Container(
-      padding: const EdgeInsets.all(16),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.flash_on,
-                color: Theme.of(context).colorScheme.primary,
-                size: 30,
-              ),
-              SizedBox(width: 8),
-              Text(
-                "전기먹는 하마!",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-          _buildPowerUsagePieChart(),
-          Text(
-            mostPowerConsumingDevice,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black.withOpacity(0.8),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15), // 살짝 더 진하게
+              blurRadius: 16,    // 흐림 정도를 높임 → 더 부드러운 경계
+              spreadRadius: 1,   // 그림자 넓이를 약간 확장
+              offset: Offset(0, 6), // 아래쪽으로 더 띄우는 느낌
             ),
-          ),
 
-          SizedBox(height: 10),
-          Row(
-            children: [
-              Text(
-                "₩${formatter.format(mostPowerConsumingDeviceCost)}",
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.flash_on,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 30,
                 ),
+                SizedBox(width: 8),
+                Text(
+                  "전기먹는 하마!",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            _buildPowerUsagePieChart(),
+            Text(
+              mostPowerConsumingDevice,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
+            ),
 
-              SizedBox(width: 10),
-              Text(
-                "/ ${mostPowerConsumingDeviceUsage.toStringAsFixed(2)} kWh",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black.withOpacity(0.6),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Text(
+                  "₩${formatter.format(mostPowerConsumingDeviceCost)}",
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+
+                SizedBox(width: 10),
+                Text(
+                  "/ ${mostPowerConsumingDeviceUsage.toStringAsFixed(2)} kWh",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -332,10 +338,10 @@ class _MainPageState extends State<MainPage> {
               value: percentage,
               title: '${device.name}\n${percentage.toStringAsFixed(1)}%',
               radius: 60,
-              titleStyle: const TextStyle(
+              titleStyle:  TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             );
           }).toList(),
@@ -351,11 +357,11 @@ class _MainPageState extends State<MainPage> {
     final colorScheme = Theme.of(context).colorScheme;
     // 색상을 순환하도록 리스트로 관리
     final colorList = [
-      colorScheme.primaryContainer,          // 밝은 primary
-      colorScheme.secondaryContainer,        // 밝은 secondary
-      colorScheme.tertiaryContainer ?? Colors.purple.shade100,
-      colorScheme.inversePrimary.withOpacity(0.8), // 대비되는 밝은색
-      Colors.amber.shade100,
+      colorScheme.primary,          // 밝은 primary
+      colorScheme.primary.withOpacity(0.8),        // 밝은 secondary
+      colorScheme.primary.withOpacity(0.6),
+      colorScheme.primary.withOpacity(0.4),
+      colorScheme.primary.withOpacity(0.2),
       Colors.lightGreen.shade100,
       Colors.cyan.shade100,
     ];

@@ -162,7 +162,7 @@ class _DayGraphState extends State<DayGraph> {
                 padding: const EdgeInsets.fromLTRB(8, 16, 16, 16),
                 child: LineChart(
                   LineChartData(
-                    backgroundColor: Theme.of(context).colorScheme.background,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     lineTouchData: _buildLineTouchData(),
                     gridData: _buildGridData(horizontalInterval),
                     titlesData: _buildTitlesData(horizontalInterval),
@@ -193,7 +193,7 @@ class _DayGraphState extends State<DayGraph> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withOpacity(0.85),
+        color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: DropdownButtonHideUnderline(
@@ -243,7 +243,7 @@ class _DayGraphState extends State<DayGraph> {
   LineTouchData _buildLineTouchData() {
     return LineTouchData(
       touchTooltipData: LineTouchTooltipData(
-        getTooltipColor: (touchedSpot) => Theme.of(context).colorScheme.secondary,
+        getTooltipColor: (touchedSpot) => Theme.of(context).colorScheme.primary.withOpacity(0.9),
         fitInsideHorizontally: true,
         fitInsideVertically: true,
         tooltipRoundedRadius: 8,
@@ -288,7 +288,7 @@ class _DayGraphState extends State<DayGraph> {
             padding: const EdgeInsets.only(right: 4),
             child: Text(
               '${value.toStringAsFixed(1)} kWh',
-              style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onBackground),
+              style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
         ),
@@ -317,7 +317,7 @@ class _DayGraphState extends State<DayGraph> {
                   dateStr,
                   style: TextStyle(
                     fontSize: 10,
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               );
@@ -333,27 +333,23 @@ class _DayGraphState extends State<DayGraph> {
 
   /// 라인 차트 바 데이터
   LineChartBarData _buildLineChartBarData() {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
     return LineChartBarData(
       spots: getChartData(),
       isCurved: true,
-      gradient: LinearGradient(
-        colors: [
-          Theme.of(context).colorScheme.primary,
-          Theme.of(context).colorScheme.secondary,
-        ],
-      ),
+      color: primaryColor,           // 선 색상
       barWidth: 3,
       isStrokeCapRound: true,
       belowBarData: BarAreaData(
         show: true,
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary.withOpacity(0.2),
-            Theme.of(context).colorScheme.secondary.withOpacity(0.1),
-          ],
-        ),
+        color: primaryColor.withOpacity(0.15), // 단일 색상 영역
       ),
-      dotData: FlDotData(show: true),
+      dotData: FlDotData(
+        show: true,
+        // dotColor: primaryColor,      // 도트 색상
+      ),
     );
   }
+
 }

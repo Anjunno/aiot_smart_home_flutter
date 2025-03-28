@@ -100,23 +100,23 @@ class _TabPageState extends State<TabPage> {
                     ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(false),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text("취소", style: TextStyle(color: Colors.black)),
+                      child:  Text("취소", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(true),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text("확인", style: TextStyle(color: Colors.white)),
+                      child:  Text("확인", style: TextStyle(color:Theme.of(context).colorScheme.surface)),
                     ),
                   ],
                 ),
@@ -131,32 +131,32 @@ class _TabPageState extends State<TabPage> {
       return false; // 기본 뒤로가기 동작 막기
     },child:  Scaffold(
       appBar: AppBar(
-        backgroundColor: colorScheme.secondary,
+        backgroundColor: colorScheme.surface,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        // title: Text('Blinked',
-        //     style: TextStyle(
-        //         color: Theme.of(context).colorScheme.onSecondary,
-        //         fontWeight: FontWeight.bold)),
+        title: Text('kkamppak',
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.bold)),
         leading: Builder(builder: (context) {
           return IconButton(
             onPressed: () {
               Scaffold.of(context).openDrawer();
             },
-            icon: Icon(Icons.menu, color: colorScheme.onSecondary),
+            icon: Icon(Icons.menu, color: colorScheme.onSurface),
           );
         }),
         actions: [
-          IconButton(
-            onPressed: () async {
-              await _removeTokens();
-              showToast("토큰제거 완료.");
-            },
-            icon: Icon(
-              Icons.logout,
-              color: colorScheme.onSecondary,
-            ),
-          ),
+          // IconButton(
+          //   onPressed: () async {
+          //     await _removeTokens();
+          //     showToast("토큰제거 완료.");
+          //   },
+          //   icon: Icon(
+          //     Icons.logout,
+          //     color: colorScheme.onSurface,
+          //   ),
+          // ),
           IconButton(
             onPressed: () {
               setState(() {
@@ -171,7 +171,7 @@ class _TabPageState extends State<TabPage> {
               _notificationsEnabled
                   ? Icons.notifications
                   : Icons.notifications_off,
-              color: colorScheme.onSecondary,
+              color: colorScheme.onSurface,
             ),
           ),
           IconButton(
@@ -192,12 +192,13 @@ class _TabPageState extends State<TabPage> {
               MyApp.themeNotifier.value == ThemeMode.light
                   ? Icons.dark_mode
                   : Icons.light_mode,
-              color: colorScheme.onSecondary,
+              color: colorScheme.onSurface,
             ),
           )
         ],
       ),
       drawer: Drawer(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -218,7 +219,7 @@ class _TabPageState extends State<TabPage> {
                     ? NetworkImage(
                     kakaoUser!.kakaoAccount!.profile!.profileImageUrl!)
                     : const AssetImage('assets/good.png') as ImageProvider,
-                backgroundColor: colorScheme.onSecondary,
+                backgroundColor: colorScheme.surface,
               ),
             ),
             ListTile(
@@ -305,6 +306,7 @@ class _TabPageState extends State<TabPage> {
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (context) => AlertDialog(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     title: const Text("로그아웃"),
                     content: const Text("정말 로그아웃하시겠습니까?"),
                     actions: [
@@ -319,18 +321,18 @@ class _TabPageState extends State<TabPage> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text("취소", style: TextStyle(color: Colors.black)),
+                            child:  Text("취소", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                           ),
                           const SizedBox(width: 10),
                           ElevatedButton(
                             onPressed: () => Navigator.of(context).pop(true),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.secondary,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text("확인", style: TextStyle(color: Colors.white)),
+                            child:  Text("확인", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
                           ),
                         ],
                       ),
@@ -379,9 +381,9 @@ class _TabPageState extends State<TabPage> {
         ),
         child: BottomNavigationBar(
           selectedLabelStyle: TextStyle(fontSize: 16),
-          selectedItemColor: colorScheme.onPrimary,
+          selectedItemColor: colorScheme.primary,
           unselectedItemColor: colorScheme.onSurface,
-          backgroundColor: colorScheme.secondary,
+          backgroundColor: colorScheme.surface,
           onTap: _onItemTapped,
           currentIndex: _selectedIndex,
           items: <BottomNavigationBarItem>[

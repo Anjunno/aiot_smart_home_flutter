@@ -75,9 +75,14 @@ class _RootPageState extends State<RootPage> {
               importance: Importance.max,
               priority: Priority.high,
               icon: '@mipmap/ic_launcher',
+              styleInformation: BigTextStyleInformation(
+                notification.body ?? '',
+                contentTitle: notification.title,
+              ),
             ),
           ),
         );
+
       }
     });
 

@@ -15,17 +15,15 @@ import '../dioRequest.dart';
 import '../providers/kakao_user_provider.dart';
 
 
-Future<void> kakaoLogin(String acccessToken) async {
+Future<void> kakaoLogin(String accessToken) async {
   print("카카오 로그인 -> 서버 함수 실행");
   final url = dotenv.get("URL");
   final storage = FlutterSecureStorage();
   final dio = Dio();
   final fcmToken = await FirebaseMessaging.instance.getToken();
   print('📱 FCM Token: $fcmToken');
-  final data = {
-    'fcmKey': fcmToken,
-  };
-  final response = await dio.get(url + "/kakao/flutter?accessToken=" + acccessToken, data: data);
+  print(accessToken);
+  final response = await dio.get(url + "/kakao/login?accessToken=$accessToken&fcmKey=$fcmToken");
 
 
   if (response.statusCode == 200) {

@@ -333,9 +333,9 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
       floatingActionButton: _showFab
           ? FloatingActionButton(
         onPressed: _createGroupName,
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.9),
         foregroundColor: Theme.of(context).colorScheme.onSecondary,
-        child: const Icon(Icons.add),
+        child:  Icon(Icons.add, color: Theme.of(context).colorScheme.surface,),
       )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -367,153 +367,158 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
             bool groupState = (group['devices'] ?? [])
                 .every((device) => device['power'] == true);
 
-            return Card(
-              color: Theme.of(context).colorScheme.surfaceContainer,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 3,
-              child: ListTile(
-                title: Text(group['groupName']),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () {
-                        _showAddGroupDialog(
-                            _groups[index]["groupId"].toString());
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+              child: Card(
+                color: Theme.of(context).colorScheme.surfaceContainer,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 3,
+                child: ListTile(
+                  title: Text(group['groupName']),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          _showAddGroupDialog(
+                              _groups[index]["groupId"].toString());
+                        },
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            String groupName = _groups[index]["groupName"];
+                            await groupDelete(context, _groups[index]["groupId"]);
+                            // showToast("$groupName 이(가) 삭제되었습니다.");
+                            await _loadGroups();
+                          }, icon: const Icon(Icons.delete)),
+                      IconButton(onPressed: () {
+                        groupActionRun(context, _groups[index]["groupId"]);
                       },
-                    ),
-                    IconButton(
-                        onPressed: () async {
-                          String groupName = _groups[index]["groupName"];
-                          await groupDelete(context, _groups[index]["groupId"]);
-                          // showToast("$groupName 이(가) 삭제되었습니다.");
-                          await _loadGroups();
-                        }, icon: const Icon(Icons.delete)),
-                    IconButton(onPressed: () {
-                      groupActionRun(context, _groups[index]["groupId"]);
-                    },
-                        icon: const Icon(Icons.play_arrow)),
-                    // ElevatedButton(
-                    //     style: ElevatedButton.styleFrom(
-                    //       backgroundColor: Theme.of(context)
-                    //           .colorScheme
-                    //           .onInverseSurface,
-                    //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                    //       elevation: 10
-                    //     ),
-                    //     onPressed: () {
-                    //       groupActionRun(_groups[index]["groupId"]);
-                    //     },
-                    //     child: Text("실행")
-                    // ),
-                  ],
-                ),
-                onTap: () async {
-                  // groupActionCheck 결과 받아오기
-                  List<Map<String, dynamic>> groupAction = await groupActionCheck(context, _groups[index]["groupId"]);
+                          icon: const Icon(Icons.play_arrow)),
+                      // ElevatedButton(
+                      //     style: ElevatedButton.styleFrom(
+                      //       backgroundColor: Theme.of(context)
+                      //           .colorScheme
+                      //           .onInverseSurface,
+                      //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      //       elevation: 10
+                      //     ),
+                      //     onPressed: () {
+                      //       groupActionRun(_groups[index]["groupId"]);
+                      //     },
+                      //     child: Text("실행")
+                      // ),
+                    ],
+                  ),
+                  onTap: () async {
+                    // groupActionCheck 결과 받아오기
+                    List<Map<String, dynamic>> groupAction = await groupActionCheck(context, _groups[index]["groupId"]);
 
-                  // 다이얼로그 표시
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        title: Row(
-                          children: [
-                            Icon(Icons.devices, color: Theme.of(context).colorScheme.secondary,),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                "${group["groupName"]} 설정 상태",
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                    // 다이얼로그 표시
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          backgroundColor: Theme.of(context).colorScheme.surface,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          title: Row(
+                            children: [
+                              Icon(Icons.group, color: Theme.of(context).colorScheme.primary,),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  "${group["groupName"]} 설정 상태",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        content: SingleChildScrollView( // 스크롤 가능하게 감싸기
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.8, // 다이얼로그 크기 조절
-                            child: groupAction.isNotEmpty
-                                ? Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: groupAction.map((group) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 8),
-                                    group["plug"].isNotEmpty
-                                        ? Column(
-                                      children: (group["plug"] as List).map((plug) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(bottom: 8.0),
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            elevation: 4,
-                                            child: ListTile(
-                                              leading: Icon(Icons.power, color: Colors.orange),
-                                              title: Text('${plug["plugName"]}',
-                                                  style: TextStyle(fontWeight: FontWeight.bold)),
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text('Plug ID: ${plug["plugId"]}', style: TextStyle(fontSize: 10),),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        "동작 설정",
-                                                        style: TextStyle(
+                            ],
+                          ),
+                          content: SingleChildScrollView( // 스크롤 가능하게 감싸기
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.8, // 다이얼로그 크기 조절
+                              child: groupAction.isNotEmpty
+                                  ? Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: groupAction.map((group) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 8),
+                                      group["plug"].isNotEmpty
+                                          ? Column(
+                                        children: (group["plug"] as List).map((plug) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(bottom: 8.0),
+                                            child: Card(
+                                              color: Theme.of(context).colorScheme.surfaceContainer,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              elevation: 4,
+                                              child: ListTile(
+                                                leading: Icon(Icons.power, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                                title: Text('${plug["plugName"]}',
+                                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text('Plug ID: ${plug["plugId"]}', style: TextStyle(fontSize: 10),),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "동작 설정",
+                                                          style: TextStyle(
+                                                            color: plug["plugControl"] == "on"
+                                                                ? Colors.green
+                                                                : Colors.red,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 8),
+                                                        Icon(
+                                                          plug["plugControl"] == "on"
+                                                              ? Icons.toggle_on
+                                                              : Icons.toggle_off,
                                                           color: plug["plugControl"] == "on"
                                                               ? Colors.green
                                                               : Colors.red,
                                                         ),
-                                                      ),
-                                                      const SizedBox(width: 8),
-                                                      Icon(
-                                                        plug["plugControl"] == "on"
-                                                            ? Icons.toggle_on
-                                                            : Icons.toggle_off,
-                                                        color: plug["plugControl"] == "on"
-                                                            ? Colors.green
-                                                            : Colors.red,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    )
-                                        : const Text('등록된 플러그가 없습니다.'),
-                                    const SizedBox(height: 8),
-                                  ],
-                                );
-                              }).toList(),
-                            )
-                                : const Text('그룹 설정이 필요합니다.'),
-                          ),
-                        ),
-                        actions: [
-
-                          ElevatedButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.secondary,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                          );
+                                        }).toList(),
+                                      )
+                                          : const Text('등록된 플러그가 없습니다.'),
+                                      const SizedBox(height: 8),
+                                    ],
+                                  );
+                                }).toList(),
+                              )
+                                  : const Text('그룹 설정이 필요합니다.'),
                             ),
-                            child: const Text("닫기", style: TextStyle(color: Colors.white)),
                           ),
+                          actions: [
 
-                        ],
-                      );
-                    },
-                  );
-                },
+                            ElevatedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: const Text("닫기", style: TextStyle(color: Colors.white)),
+                            ),
+
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             );
           },

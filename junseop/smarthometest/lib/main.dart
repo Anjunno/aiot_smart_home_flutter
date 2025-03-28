@@ -23,11 +23,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart'; // 이거 추가
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:uni_links3/uni_links.dart';
+import 'dart:async';
+
+
+
+StreamSubscription? _linkSub;
+
 
 // Navigator.of(context).popUntil((route) => route.isFirst); 위젯트리 확인해보기
 // flutter run -d chrome --web-port=8080
-
-
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
@@ -112,6 +117,14 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.green,
+
+            ).copyWith(
+              primary: Colors.green,
+              // 카드 등 기본 배경
+              surface: Colors.white,
+              // onSurface: Colors.black87,
+              surfaceContainer:Color(0xFFF0F0F0),
+              secondary: Color(0x66BB6A),
             ),
             useMaterial3: true, // Material3 적용
           ),
@@ -138,22 +151,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// @override
-// Widget build(BuildContext context) {
-//   return MaterialApp(
-//     title: 'Flutter Demo',
-//     theme: ThemeData(
-//       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-//       useMaterial3: true,
-//     ),
-//     home: RootPage(),  // 초기 페이지 설정
-//     routes: {
-//       LoginPage.routeName: (context) => LoginPage(),
-//       RootPage.routeName: (context) => RootPage(),
-//       TabPage.routeName: (context) => TabPage(),
-//       SignUpPage.routeName: (context) => SignUpPage(),
-//       DevicemanagementPage.routeName: (context) => DevicemanagementPage(),
-//     },
-//   );
-// }

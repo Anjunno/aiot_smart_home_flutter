@@ -39,12 +39,6 @@ class _DeviceGraphState extends State<DeviceGraph> {
             color: Theme.of(context).colorScheme.primary,
             width: 16,
             borderRadius: BorderRadius.circular(4),
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).colorScheme.primary,
-                Theme.of(context).colorScheme.secondary
-              ],
-            ),
           ),
         ],
       );
@@ -53,7 +47,7 @@ class _DeviceGraphState extends State<DeviceGraph> {
 
   Widget adviceWidget() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(8,16,8,8),
       child: Container(
         padding: const EdgeInsets.all(8),
         width: double.infinity,
@@ -144,7 +138,7 @@ class _DeviceGraphState extends State<DeviceGraph> {
             padding: const EdgeInsets.fromLTRB(8, 24, 16, 8),
             child: BarChart(
               BarChartData(
-                backgroundColor: Theme.of(context).colorScheme.background,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 barGroups: getChartData(),
                 borderData: FlBorderData(show: false),
                 gridData: FlGridData(show: true, drawVerticalLine: false),
@@ -157,7 +151,7 @@ class _DeviceGraphState extends State<DeviceGraph> {
                           if (value % 1 == 0) { // 1 단위로 나누어떨어질 때만
                             return Text(
                               '${value.toStringAsFixed(0)} kWh',
-                              style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onBackground),
+                              style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface),
                             );
                           } else {
                             return const SizedBox.shrink(); // 빈 위젯
@@ -181,7 +175,7 @@ class _DeviceGraphState extends State<DeviceGraph> {
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.onBackground,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
@@ -203,7 +197,7 @@ class _DeviceGraphState extends State<DeviceGraph> {
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
                     getTooltipColor: (touchedSpot) {
-                      return Theme.of(context).colorScheme.secondary;
+                      return Theme.of(context).colorScheme.primary.withOpacity(0.9);
                     },
                     fitInsideHorizontally: true,
                     fitInsideVertically: true,

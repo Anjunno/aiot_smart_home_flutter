@@ -71,11 +71,11 @@ class _MonthGraphState extends State<MonthGraph> {
             padding: const EdgeInsets.fromLTRB(8, 32, 16, 16),
             child: LineChart(
               LineChartData(
-                backgroundColor: Theme.of(context).colorScheme.background,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
                     getTooltipColor: (touchedSpot) {
-                      return Theme.of(context).colorScheme.secondary;
+                      return Theme.of(context).colorScheme.primary.withOpacity(0.9);
                     },
                     fitInsideHorizontally: true,
                     fitInsideVertically: true,
@@ -114,7 +114,7 @@ class _MonthGraphState extends State<MonthGraph> {
                         return Padding(
                           padding: const EdgeInsets.only(right: 4),
                           child: Text('${value.toStringAsFixed(1)} kWh',
-                              style: TextStyle(fontSize: 9, color: Theme.of(context).colorScheme.onBackground)),
+                              style: TextStyle(fontSize: 9, color: Theme.of(context).colorScheme.onSurface)),
                         );
                       },
                     ),
@@ -134,7 +134,7 @@ class _MonthGraphState extends State<MonthGraph> {
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onBackground,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           );
@@ -151,26 +151,20 @@ class _MonthGraphState extends State<MonthGraph> {
                   LineChartBarData(
                     spots: getChartData(),
                     isCurved: true,
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary,
-                        Theme.of(context).colorScheme.secondary,
-                      ],
-                    ),
+                    color: Theme.of(context).colorScheme.primary, // ✅ 선 색상
                     barWidth: 3,
                     isStrokeCapRound: true,
                     belowBarData: BarAreaData(
                       show: true,
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                          Theme.of(context).colorScheme.secondary.withOpacity(0.1),
-                        ],
-                      ),
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.15), // ✅ 단일 배경 색
                     ),
-                    dotData: FlDotData(show: true), // 점을 표시하여 데이터 강조
+                    dotData: FlDotData(
+                      show: true,
+                      // dotColor: Theme.of(context).colorScheme.primary, // ✅ 도트 색상 (선택)
+                    ),
                   ),
                 ],
+
                 minY: 0,
                 maxY: maxEnergy,
               ),
