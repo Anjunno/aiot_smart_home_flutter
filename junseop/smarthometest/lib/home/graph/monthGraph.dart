@@ -38,6 +38,60 @@ class _MonthGraphState extends State<MonthGraph> {
     }).toList();
   }
 
+  Widget adviceWidget() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8,16,8,8),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          // crossAxisAlignment: CrossAxisAlignment.start, // 아이콘보다 텍스트 높이가 클 때 맞춰줌
+          children: [
+            Icon(
+              Icons.lightbulb_rounded,
+              color: Colors.yellow[800],
+              size: 36,
+            ),
+            SizedBox(width: 8),
+            Expanded( // Column을 감싸서 남은 공간 차지하도록 함
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "한 줄 조언",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "최근 전력 사용이 급증하고 있어요!\n난방기기와 대기전력 기기의 사용 시간을 줄이면 전기료를 크게 절감할 수 있어요.",
+                    // style: TextStyle(
+                    //   fontWeight: FontWeight.w900,
+                    // ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double maxEnergy = energyData.isNotEmpty
@@ -66,6 +120,7 @@ class _MonthGraphState extends State<MonthGraph> {
         : Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        adviceWidget(),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(8, 32, 16, 16),

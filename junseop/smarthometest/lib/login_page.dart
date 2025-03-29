@@ -96,10 +96,10 @@ class _LoginPageState extends State<LoginPage> {
           );
         } else {
           // 아직 온보딩 안 본 경우 → 온보딩 페이지로 이동
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.pushNamed(
             context,
             OnboardingPage.routeName,
-                (route) => false,
+                // (route) => false,
           );
         }
 
@@ -201,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4)),
                           ),
@@ -227,10 +227,10 @@ class _LoginPageState extends State<LoginPage> {
                                   );
                                 } else {
                                   // 아직 안 봤으면 온보딩 페이지로
-                                  Navigator.pushNamedAndRemoveUntil(
+                                  Navigator.pushNamed(
                                     context,
                                     OnboardingPage.routeName,
-                                        (route) => false,
+                                        // (route) => false,
                                   );
                                 }
                               } else {
@@ -245,7 +245,7 @@ class _LoginPageState extends State<LoginPage> {
                             child: Text('로그인', style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface
+                                color: Theme.of(context).colorScheme.surface
                             )),
                           ),
                         ),
@@ -255,7 +255,7 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4)),
                           ),
@@ -268,7 +268,7 @@ class _LoginPageState extends State<LoginPage> {
                               fontSize: 16,
                               fontWeight:
                               FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: Theme.of(context).colorScheme.surface,
                             )),
                           ),
                         ),

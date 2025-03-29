@@ -95,6 +95,60 @@ class _DayGraphState extends State<DayGraph> {
     }).toList();
   }
 
+  Widget adviceWidget() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8,16,8,8),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          // crossAxisAlignment: CrossAxisAlignment.start, // 아이콘보다 텍스트 높이가 클 때 맞춰줌
+          children: [
+            Icon(
+              Icons.lightbulb_rounded,
+              color: Colors.yellow[800],
+              size: 36,
+            ),
+            SizedBox(width: 8),
+            Expanded( // Column을 감싸서 남은 공간 차지하도록 함
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "한 줄 조언",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "최근 일주일 중 사용량이 높은 날(23일·27일)을 기준으로 고소비 기기 사용 시간대를 줄이면 전력 절감에 효과적이에요.",
+                    // style: TextStyle(
+                    //   fontWeight: FontWeight.w900,
+                    // ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double maxEnergy = _data.isNotEmpty
@@ -137,6 +191,7 @@ class _DayGraphState extends State<DayGraph> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        adviceWidget(),
         Expanded(
           child: Stack(
             children: [

@@ -138,21 +138,22 @@ class _SignUpPageState extends State<SignUpPage> {
                                 child: _isNickNameChecked
                                     ? ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: Theme.of(context).colorScheme.primary,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                     padding: EdgeInsets.zero,
                                   ),
                                   onPressed: null,
-                                  child: const Icon(Icons.check, color: Colors.white),
+                                  child: Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
                                 )
                                     : ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                    backgroundColor: Theme.of(context).colorScheme.primary,
                                     padding: EdgeInsets.zero,
                                   ),
                                   onPressed: () async {
                                     if (_nickNameController.text.isEmpty) {
-                                      showToast('닉네임을 입력하세요.');
+                                      showToast('닉네임을 입력하세요.',gravity: ToastGravity.CENTER);
                                       return;
                                     }
                                     final result = await nickNameExists(_nickNameController.text);
@@ -162,7 +163,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       });
                                     }
                                   },
-                                  child: const Text('확인', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                  child: Text('확인', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.surface)),
                                 ),
                               ),
                             ),
@@ -219,16 +220,17 @@ class _SignUpPageState extends State<SignUpPage> {
                                 child: _isIdChecked
                                     ? ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: Theme.of(context).colorScheme.primary,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                     padding: EdgeInsets.zero,
                                   ),
                                   onPressed: null,
-                                  child: const Icon(Icons.check, color: Colors.white),
+                                  child:  Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
                                 )
                                     : ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                    backgroundColor: Theme.of(context).colorScheme.primary,
                                     padding: EdgeInsets.zero,
                                   ),
                                   onPressed: () async {
@@ -256,7 +258,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       });
                                     }
                                   },
-                                  child: const Text('확인', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                  child:  Text('확인', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Theme.of(context).colorScheme.surface )),
                                 ),
                               ),
                             ),
@@ -342,13 +344,15 @@ class _SignUpPageState extends State<SignUpPage> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
+
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                             ),
                             onPressed: _onSignUpPressed,
-                            child: const Padding(
+                            child:  Padding(
                               padding: EdgeInsets.all(10.0),
-                              child: Text('회원가입', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              child: Text('회원가입', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.surface)),
                             ),
                           ),
                         ),

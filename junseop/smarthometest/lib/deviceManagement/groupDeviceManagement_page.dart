@@ -195,6 +195,142 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
     );
   }
 
+  // ⭐ 그룹 액션 결과 Dialog ⭐
+  void _showActionResult(Map<String, dynamic> result) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final successList = List<String>.from(result["successArray"]);
+        final errorList = List<String>.from(result["errorArray"]);
+
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text(
+            "실행 결과",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Text(
+                //   "그룹의 실행 결과를 확인하세요.",
+                //   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                // ),
+                // const SizedBox(height: 16),
+                //
+                // // ✅ 성공/실패 카운트
+                // Row(
+                //   children: [
+                //     Text("성공: ${result["successCount"]}", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                //     const SizedBox(width: 16),
+                //     Text("실패: ${result["errorCount"]}", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                //   ],
+                // ),
+
+                const SizedBox(height: 20),
+
+                // ✅ 성공 리스트
+                if (successList.isNotEmpty) ...[
+                  Text("성공한 기기: ${result["successCount"]}", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: successList.map(
+                            (device) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  "• $device",
+                                  style: const TextStyle(fontSize: 14),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 20),
+                            ],
+                          ),
+                        ),
+                      ).toList(),
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 20),
+
+                // ❌ 실패 리스트
+                if (errorList.isNotEmpty) ...[
+                  Text("실패한 기기: ${result["errorCount"]}", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.error.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: errorList.map(
+                            (device) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  "• $device",
+                                  style: const TextStyle(fontSize: 14),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Icon(Icons.cancel, color: Theme.of(context).colorScheme.error, size: 20),
+                            ],
+                          ),
+                        ),
+                      ).toList(),
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 28),
+
+                // 닫기 버튼
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Text(
+                      "닫기",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
+
+
 
 
   // ⭐ 그룹 액션 추가 Dialog ⭐
@@ -413,9 +549,9 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
           padding: const EdgeInsets.all(12),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,              // 2열
-            crossAxisSpacing: 12,           // 열 간 간격
-            mainAxisSpacing: 12,            // 행 간 간격
-            childAspectRatio: 1.2,          // 카드 비율 조정 (너비 대비 높이)
+            crossAxisSpacing: 8,           // 열 간 간격
+            mainAxisSpacing: 8,            // 행 간 간격
+            childAspectRatio: 1.4,          // 카드 비율 조정 (너비 대비 높이)
           ),
           itemCount: _groups.length,
           itemBuilder: (context, index) {
@@ -427,7 +563,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              elevation: 2,
+              elevation: 3,
               child: InkWell(
                 onTap: () async {
                   List<Map<String, dynamic>> groupAction = await groupActionCheck(context, _groups[index]["groupId"]);
@@ -533,9 +669,9 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                     },
                   );
                 },
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -571,8 +707,12 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                             icon: Icons.play_arrow,
                             tooltip: "실행",
                             size: 25,
-                            onTap: () => groupActionRun(context, group["groupId"]),
-                          ),
+                              onTap: () async {
+                                Map<String, dynamic> result = await groupActionRun(context, group["groupId"]);
+                                if(result['successCount'] != -1){
+                                  _showActionResult(result);
+                                };
+                              }),
 
                           _buildIconButton(
                             icon: Icons.delete,

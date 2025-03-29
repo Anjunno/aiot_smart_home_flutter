@@ -129,16 +129,17 @@ class _TabPageState extends State<TabPage> {
       }
 
       return false; // 기본 뒤로가기 동작 막기
-    },child:  Scaffold(
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Text('KKAM PAK',
+    },
+        child:  Scaffold(
+          appBar: AppBar(
+          backgroundColor: colorScheme.surface,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          title: Text('Blink',
             style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold)),
-        leading: Builder(builder: (context) {
+                leading: Builder(builder: (context) {
           return IconButton(
             onPressed: () {
               Scaffold.of(context).openDrawer();
@@ -256,26 +257,26 @@ class _TabPageState extends State<TabPage> {
                 Navigator.pushNamed(context, OnboardingPage.routeName);
               },
             ),
+            // ListTile(
+            //   leading: Icon(
+            //     Icons.chat,
+            //     color: colorScheme.onSurface,
+            //   ),
+            //   title: Text(
+            //     '채팅',
+            //     style: TextStyle(
+            //         color: colorScheme.onSurface,
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.bold),
+            //   ),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     Navigator.pushNamed(context, ChatPage.routeName);
+            //   },
+            // ),
             ListTile(
               leading: Icon(
-                Icons.chat,
-                color: colorScheme.onSurface,
-              ),
-              title: Text(
-                '채팅',
-                style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, ChatPage.routeName);
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.chat,
+                Icons.notifications_rounded,
                 color: colorScheme.onSurface,
               ),
               title: Text(

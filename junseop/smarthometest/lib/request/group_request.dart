@@ -246,71 +246,62 @@ Future<List<Map<String, dynamic>>> groupActionCheck(BuildContext context, int gr
 }
 
 ///그룹 액션 실행
-//그룹 액션 실행
-// Future<void> groupActionRun(int groupId) async {
-//   final url = dotenv.get("URL");
-//   final storage = FlutterSecureStorage();
-//   final accessToken = await storage.read(key: 'ACCESS_TOKEN');
-//   final dio = Dio();
-//
-//   try {
-//     final response = await dio.get("$url/group/action/run/$groupId");
-//     print(response);
-//     print(response.statusCode);
-//
-//     // 응답이 JSON 문자열일 경우, JSON 파싱을 시도
-//     if (response.statusCode == 200) {
-//       final Map<String, dynamic> responseData =
-//       response.data is String ? jsonDecode(response.data) : response.data;
-//
-//       //응답 데이터 처리
-//       int successCount = responseData["successCount"];
-//       int errorCount = responseData["errorCount"];
-//       List<String> successArray = List<String>.from(responseData["successArray"]);
-//       List<String> errorArray = List<String>.from(responseData["errorArray"]);
-//
-//       String message = "✅ 성공한 기기 ($successCount개):\n"
-//           "${successArray.join(", ")}\n\n"
-//           "❌ 실패한 기기 ($errorCount개):\n"
-//           "${errorArray.isNotEmpty ? errorArray.join(", ") : "없음"}";
-//       showToast(message, gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_LONG);
-//     } else {
-//       showToast("그룹 설정이 필요합니다.", gravity: ToastGravity.CENTER);
-//       print("그룹 액션 실패: ${response.statusCode}");
-//     }
-//   } catch (e) {
-//     showToast("네트워크 오류 발생", gravity: ToastGravity.CENTER);
-//     print("오류 발생: $e");
-//   }
-// }
-Future<void> groupActionRun(BuildContext context, int groupId) async {
+Future<Map<String, dynamic>> groupActionRun(BuildContext context, int groupId) async {
+
   final response = await dioRequest("GET", "/group/action/run/$groupId", context: context);
 
   if (response == null || response.statusCode != 200) {
     showToast("그룹 설정이 필요합니다.", gravity: ToastGravity.CENTER);
     print("그룹 액션 실패: ${response?.statusCode}");
-    return;
+    return {
+      "successCount": -1,
+      "errorCount": 0,
+      "successArray": [],
+      "errorArray": [],
+    };
   }
-    final responseData = response.data is String ? jsonDecode(response.data) : response.data;
 
+  final data = response.data is String ? jsonDecode(response.data) : response.data;
 
-    // successCount와 errorCount가 String이면 int로 변환
-    int successCount = responseData["successCount"] is String
-        ? int.parse(responseData["successCount"])
-        : responseData["successCount"];
+  // successCount와 errorCount가 String이면 int로 변환
+  int successCount = data["successCount"] is String
+      ? int.parse(data["successCount"])
+      : data["successCount"];
 
-    int errorCount = responseData["errorCount"] is String
-        ? int.parse(responseData["errorCount"])
-        : responseData["errorCount"];
+  int errorCount = data["errorCount"] is String
+      ? int.parse(data["errorCount"])
+      : data["errorCount"];
 
-    List<String> successArray = List<String>.from(responseData["successArray"]);
-    List<String> errorArray = List<String>.from(responseData["errorArray"]);
+  List<String> successArray = List<String>.from(data["successArray"] ?? []);
+  List<String> errorArray = List<String>.from(data["errorArray"] ?? []);
 
-    String message = "✅ 성공한 기기 ($successCount개):\n${successArray.join(", ")}\n\n"
-        "❌ 실패한 기기 ($errorCount개):\n${errorArray.isNotEmpty ? errorArray.join(", ") : "없음"}";
+  if (successCount != 0 || errorCount != 0) {
+    // 필요시 메시지 출력
+    // String message =
+    //     "✅ 성공한 기기 ($successCount개):\n${successArray.join(", ")}\n\n"
+    //     "❌ 실패한 기기 ($errorCount개):\n${errorArray.isNotEmpty ? errorArray.join(", ") : "없음"}";
+    // showToast(message, gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_LONG);
+    return {
+      "successCount": successCount,
+      "errorCount": errorCount,
+      // "errorCount": 2,
+      "successArray": successArray,
+      "errorArray": errorArray,
+      // "errorArray": ["오프라인 플러그","오프라인 플러그2"],
+    };
+  } else {
+    showToast("그룹 설정이 필요합니다.",
+        gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_LONG);
 
-    showToast(message, gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_LONG);
+    return {
+      "successCount": -1,
+      "errorCount": 0,
+      "successArray": [],
+      "errorArray": [],
+    };
+  }
 }
+
 
 
 
