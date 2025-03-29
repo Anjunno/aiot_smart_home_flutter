@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
-import 'package:smarthometest/chat_page.dart';
+import 'package:smarthometest/dashboard_page.dart';
 import 'package:smarthometest/home/graph/graphMain_page.dart';
 import 'package:smarthometest/main_page.dart';
 import 'package:smarthometest/login_page.dart';
@@ -257,23 +257,23 @@ class _TabPageState extends State<TabPage> {
                 Navigator.pushNamed(context, OnboardingPage.routeName);
               },
             ),
-            // ListTile(
-            //   leading: Icon(
-            //     Icons.chat,
-            //     color: colorScheme.onSurface,
-            //   ),
-            //   title: Text(
-            //     '채팅',
-            //     style: TextStyle(
-            //         color: colorScheme.onSurface,
-            //         fontSize: 16,
-            //         fontWeight: FontWeight.bold),
-            //   ),
-            //   onTap: () {
-            //     Navigator.pop(context);
-            //     Navigator.pushNamed(context, ChatPage.routeName);
-            //   },
-            // ),
+            ListTile(
+              leading: Icon(
+                Icons.dashboard,
+                color: colorScheme.onSurface,
+              ),
+              title: Text(
+                '대시보드',
+                style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, DashboardPage.routeName);
+              },
+            ),
             ListTile(
               leading: Icon(
                 Icons.notifications_rounded,

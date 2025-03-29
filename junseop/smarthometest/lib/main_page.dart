@@ -57,6 +57,8 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+
+  ///이번 달 예상 전기요금
   Widget _buildElectricityCostSection() {
     final formatter = NumberFormat('#,###');
     // 예시 데이터 (실제 데이터로 교체)
@@ -381,7 +383,6 @@ class _MainPageState extends State<MainPage> {
               children: [
                 _buildElectricityCostSection(),
                 _buildTierIndicator(),
-                // _buildPowerUsagePieChart(),
                 SizedBox(height: 20),
                 _buildPowerConsumingDeviceSection(),
               ],

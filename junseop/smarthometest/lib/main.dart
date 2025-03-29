@@ -16,7 +16,7 @@ import 'myInfoPage.dart';
 import 'root_page.dart';
 import 'signUp_page.dart';
 import 'tab_page.dart';
-import 'chat_page.dart';
+import 'dashboard_page.dart';
 import 'outing_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -142,7 +142,7 @@ class MyApp extends StatelessWidget {
             GroupDevicemanagementPage.routeName: (context) => GroupDevicemanagementPage(),
             MyInfoPage.routeName: (context) => MyInfoPage(),
             OutingPage.routeName: (context) => OutingPage(),
-            ChatPage.routeName: (context) => ChatPage(),
+            DashboardPage.routeName: (context) => DashboardPage(),
             MainPage.routeName: (context) => MainPage(),
             GraphMainPage.routeName: (context) => GraphMainPage(),
             OnboardingPage.routeName: (context) => OnboardingPage(),
