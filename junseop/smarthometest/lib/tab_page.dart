@@ -135,10 +135,11 @@ class _TabPageState extends State<TabPage> {
           backgroundColor: colorScheme.surface,
           automaticallyImplyLeading: false,
           centerTitle: true,
-          title: Text('Blink',
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontWeight: FontWeight.bold)),
+          title: Image(image: AssetImage("assets/Blink_onsurface.png"), width: 60, ),
+          // Text('Blink',
+          //   style: TextStyle(
+          //       color: Theme.of(context).colorScheme.onSurface,
+          //       fontWeight: FontWeight.bold)),
                 leading: Builder(builder: (context) {
           return IconButton(
             onPressed: () {

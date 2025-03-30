@@ -51,6 +51,7 @@ dependencies:
   permission_handler: ^11.4.0
   grouped_list: ^6.0.0
   uni_links3: ^0.5.3
+  flutter_native_splash: ^2.4.4
 
 dev_dependencies:
   flutter_test:
@@ -67,7 +68,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: false
-  image_path: "assets/good.png"  # 여기에 원하는 아이콘 경로 입력
+  image_path: "assets/blink6.png"  # 여기에 원하는 아이콘 경로 입력
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
