@@ -156,12 +156,12 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image(image: AssetImage("assets/Blink6.png"), width: 150, ),
+                      Image(image: AssetImage("assets/Blink_cropped.png"), width: 150, ),
                       // Text(
                       //   'Login',
                       //   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
                       // ),
-                      // _gap(),
+                      _gap(),
                       TextFormField(
                         controller: _idController,
                         keyboardType: TextInputType.emailAddress,
