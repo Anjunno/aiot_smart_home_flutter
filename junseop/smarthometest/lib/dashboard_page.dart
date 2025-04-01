@@ -206,9 +206,13 @@ Widget _buildAdviceCard(BuildContext context, Map<String, dynamic> advice) {
           ],
         ),
         SizedBox(height: 16),
-        _buildAdviceSection("🔎 문제", advice['problem']),
-        _buildAdviceSection("📌 원인", advice['cause']),
-        _buildAdviceSection("✅ 해결책", advice['solution']),
+          if (advice['problem']?.toString().trim().isNotEmpty != true)
+            _buildAdviceSection("", advice['raw'])
+          else ...[
+            _buildAdviceSection("🔎 문제", advice['problem']),
+            _buildAdviceSection("📌 원인", advice['cause']),
+            _buildAdviceSection("✅ 해결책", advice['solution']),
+          ]
       ],
     ),
   );
