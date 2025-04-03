@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../request/advice_requests.dart';
 import '../../request/graph_request.dart';
 
 class MonthGraph extends StatefulWidget {
@@ -12,12 +13,39 @@ class MonthGraph extends StatefulWidget {
 
 class _MonthGraphState extends State<MonthGraph> {
   List<Map<String, dynamic>> energyData = [];
+  Map<String, dynamic> _adviceData = {};
   bool _isLoading = true; // 로딩 상태 추가
 
   @override
   void initState() {
     super.initState();
-    fetchMonthData();
+    initializeData();
+  }
+
+  Future<void> initializeData() async {
+    await fetchMonthData();
+    await fetchAdviceData();
+  }
+
+  ///조언 데이터 불러오기
+  Future<void> fetchAdviceData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      Map<String, dynamic> data = await getAdvice(context, "day");
+      setState(() {
+        // _adviceData = data;
+        _adviceData = {"advice" : "최근 전력 사용이 급증하고 있어요!\n난방기기와 대기전력 기기의 사용 시간을 줄이면 전기료를 크게 절감할 수 있어요."};
+      });
+    } catch (e) {
+      print("Error fetching advice: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> fetchMonthData() async {
@@ -39,6 +67,7 @@ class _MonthGraphState extends State<MonthGraph> {
   }
 
   Widget adviceWidget() {
+    String advice = _adviceData['advice'] ?? '';
     return Padding(
       padding: const EdgeInsets.fromLTRB(8,16,8,8),
       child: Container(
@@ -78,7 +107,8 @@ class _MonthGraphState extends State<MonthGraph> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    "최근 전력 사용이 급증하고 있어요!\n난방기기와 대기전력 기기의 사용 시간을 줄이면 전기료를 크게 절감할 수 있어요.",
+                    advice
+                    ,
                     // style: TextStyle(
                     //   fontWeight: FontWeight.w900,
                     // ),

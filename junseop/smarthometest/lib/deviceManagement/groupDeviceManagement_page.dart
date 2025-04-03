@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smarthometest/request/group_request.dart';
 import 'package:smarthometest/toastMessage.dart';
@@ -707,12 +708,15 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                             icon: Icons.play_arrow,
                             tooltip: "실행",
                             size: 25,
-                              onTap: () async {
-                                Map<String, dynamic> result = await groupActionRun(context, group["groupId"]);
-                                if(result['successCount'] != -1){
-                                  _showActionResult(result);
-                                };
-                              }),
+                            onTap: () async {
+                              HapticFeedback.lightImpact(); // 진동 추가
+
+                              Map<String, dynamic> result = await groupActionRun(context, group["groupId"]);
+                              if (result['successCount'] != -1) {
+                                _showActionResult(result);
+                              }
+                            },
+                          ),
 
                           _buildIconButton(
                             icon: Icons.delete,

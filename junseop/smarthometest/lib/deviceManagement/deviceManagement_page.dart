@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smarthometest/request/group_request.dart'; // 기기 목록을 가져오는 요청 함수 포함
 
 class DevicemanagementPage extends StatefulWidget {
@@ -223,7 +224,12 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
                             ),
                             Switch(
                               value: _deviceStates[index],
-                              onChanged: isOnline ? (value) => _toggleDeviceState(index, value) : null,
+                              onChanged: isOnline
+                                  ? (value) {
+                                HapticFeedback.lightImpact(); // 진동
+                                _toggleDeviceState(index, value); // 상태 토글
+                              }
+                                  : null,
                             ),
                           ],
                         ),

@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../request/advice_requests.dart';
 import '../../request/graph_request.dart';
 import '../../request/group_request.dart';
 
@@ -13,12 +14,39 @@ class DeviceGraph extends StatefulWidget {
 
 class _DeviceGraphState extends State<DeviceGraph> {
   List<Map<String, dynamic>> energyData = [];
+  Map<String, dynamic> _adviceData = {};
   bool _isLoading = true; // 로딩 상태 추가
 
   @override
   void initState() {
     super.initState();
-    fetchDeviceData();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await fetchDeviceData();
+    await fetchAdviceData();
+  }
+
+  ///조언 데이터 불러오기
+  Future<void> fetchAdviceData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      Map<String, dynamic> data = await getAdvice(context, "day");
+      setState(() {
+        // _adviceData = data;
+        _adviceData = {"advice" : "이번 주 전체 전력의 75% 이상이 컴퓨터 본체와 모니터에서 나왔어요! 평소 사용 후 전원 OFF 또는 절전 모드를 적극 활용해보세요"};
+      });
+    } catch (e) {
+      print("Error fetching advice: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> fetchDeviceData() async {
@@ -46,6 +74,7 @@ class _DeviceGraphState extends State<DeviceGraph> {
   }
 
   Widget adviceWidget() {
+    String advice = _adviceData['advice'] ?? '';
     return Padding(
       padding: const EdgeInsets.fromLTRB(8,16,8,8),
       child: Container(
@@ -85,7 +114,7 @@ class _DeviceGraphState extends State<DeviceGraph> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    "이번 주 전체 전력의 75% 이상이 컴퓨터 본체와 모니터에서 나왔어요! 평소 사용 후 전원 OFF 또는 절전 모드를 적극 활용해보세요",
+                    advice,
                     // style: TextStyle(
                     //   fontWeight: FontWeight.w900,
                     // ),

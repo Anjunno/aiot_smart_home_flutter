@@ -37,6 +37,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
             body: '그래프로 전력 사용량을 확인하고,\nAI 조언으로 더 똑똑하게 절약하세요.',
             imagePath: 'assets/graph1_cropped.png',
           ),
+          // PageViewModel(
+          //   titleWidget: const SizedBox.shrink(), // 타이틀 제거
+          //   bodyWidget: const SizedBox.shrink(),  // 본문 제거
+          //   image: Image.asset(
+          //     'assets/nana.png',
+          //     fit: BoxFit.contain,
+          //   ),
+          // ),
           _buildPage(
             title: '낭비되는 전기를 알려드려요',
             body: '불필요하게 켜진 기기를 감지해서\n푸시 알림으로 알려드려요.',
@@ -110,7 +118,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   /// ✅ 이미지 정렬 및 사이즈 조절 (크게 보이도록 수정)
   Widget buildImage(String path) {
     return Padding(
-      padding: const EdgeInsets.only(top: 30),
+      padding: const EdgeInsets.only(top: 60),
       child: Center(
         child: Container(
           width: 350, // ✅ 고정 너비
@@ -138,7 +146,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     contentMargin: const EdgeInsets.only(top: 20), // 전체 마진 줄임
     pageColor: Theme.of(context).colorScheme.surface,
     bodyFlex: 2,   // 내용 영역 비율 조금 줄임
-    imageFlex: 5,  // 이미지 영역 비율 늘림 → 더 아래로 밀림 효과
+    imageFlex: 3,  // 이미지 영역 비율 늘림 → 더 아래로 밀림 효과
   );
 
 
