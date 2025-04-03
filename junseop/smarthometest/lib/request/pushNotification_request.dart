@@ -14,11 +14,11 @@ Future<List<Map<String, dynamic>>> getPushNotificationLog(BuildContext context) 
   if (response == null || response.statusCode != 200) return [];
   // JSON 문자열일 경우 파싱
 
+  print(response);
   List<dynamic> data = response.data is String ? jsonDecode(response.data) : response.data;
-
   List<Map<String, dynamic>> notificationList = data.map((item) {
     return {
-              "sender" : "System",
+              "sender" : item['sender'],
               "time": item['timestamp'],
               "message": item['message']
     };}).toList();

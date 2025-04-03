@@ -25,27 +25,27 @@ class _OnboardingPageState extends State<OnboardingPage> {
           _buildPage(
             title: '요금을 미리 예측하고 절약해요',
             body: '예상 요금을 확인하고\n누진 구간도 쉽게 파악하세요.',
-            imagePath: 'assets/level.jpg',
+            imagePath: 'assets/level1_cropped.png',
           ),
           _buildPage(
             title: '전기먹는 하마는 누구?',
             body: '기기별 사용량을 분석해서\n많이 쓰는 기기를 찾아보세요.',
-            imagePath: 'assets/pieChart.jpg',
+            imagePath: 'assets/hippo_cropped.png',
           ),
           _buildPage(
             title: '스마트하게 절약해요',
             body: '그래프로 전력 사용량을 확인하고,\nAI 조언으로 더 똑똑하게 절약하세요.',
-            imagePath: 'assets/graph.jpg',
+            imagePath: 'assets/graph1_cropped.png',
           ),
           _buildPage(
             title: '낭비되는 전기를 알려드려요',
             body: '불필요하게 켜진 기기를 감지해서\n푸시 알림으로 알려드려요.',
-            imagePath: 'assets/alert_device.png', // 관련 이미지 경고 느낌으로 교체 가능
+            imagePath: 'assets/push.png', // 관련 이미지 경고 느낌으로 교체 가능
           ),
           _buildPage(
             title: '실시간 기기 제어',
             body: '언제 어디서든\n기기를 원격으로 제어하세요.',
-            imagePath: 'assets/onoff.jpg',
+            imagePath: 'assets/onoff1_cropped.png',
             footer: _buildCheckboxFooter(),
           ),
         ],
@@ -54,8 +54,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
         showSkipButton: true,
         skip: const Text('건너뛰기', style: TextStyle(fontWeight: FontWeight.bold)),
         showBackButton: true,
-        back: const Icon(Icons.arrow_back),
-        next: const Icon(Icons.arrow_forward),
+        back: const Icon(Icons.arrow_back_ios_new),
+        next: const Icon(Icons.arrow_forward_ios),
         done: Row(
           children: const [
             Icon(Icons.check),
@@ -95,7 +95,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             style: const TextStyle(fontSize: 16),
           ),
           if (footer != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 21),
             footer,
           ]
         ],
@@ -110,13 +110,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
   /// ✅ 이미지 정렬 및 사이즈 조절 (크게 보이도록 수정)
   Widget buildImage(String path) {
     return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: SizedBox(
-        width: double.infinity,
-        height: 300, // 높이를 늘려서 크게 표시
-        child: Image.asset(
-          path,
-          fit: BoxFit.contain, // 비율 유지하면서 최대한 크게
+      padding: const EdgeInsets.only(top: 30),
+      child: Center(
+        child: Container(
+          width: 350, // ✅ 고정 너비
+          height: 350, // ✅ 고정 높이
+          alignment: Alignment.center,
+          child: Image.asset(
+            path,
+            fit: BoxFit.contain, // ✅ 비율 유지
+          ),
         ),
       ),
     );
@@ -124,18 +127,20 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
 
   /// ✅ 페이지 전체 스타일
+  /// ✅ 페이지 전체 스타일 (중앙 정렬 느낌을 살리기 위해 조정)
   PageDecoration get pageDecoration => PageDecoration(
     titleTextStyle: const TextStyle(
-      fontSize: 24,
+      fontSize: 28,
       fontWeight: FontWeight.bold,
     ),
-    bodyTextStyle: const TextStyle(fontSize: 16),
-    imagePadding: const EdgeInsets.only(top: 10), // 상단 여백 줄임
-    contentMargin: const EdgeInsets.only(top: 40), // 전체 내용 아래로
+    bodyTextStyle: const TextStyle(fontSize: 20),
+    imagePadding: EdgeInsets.zero, // 이미지 여백 제거
+    contentMargin: const EdgeInsets.only(top: 20), // 전체 마진 줄임
     pageColor: Theme.of(context).colorScheme.surface,
-    bodyFlex: 3,
-    imageFlex: 4, // 이미지가 더 공간 차지하게
+    bodyFlex: 2,   // 내용 영역 비율 조금 줄임
+    imageFlex: 5,  // 이미지 영역 비율 늘림 → 더 아래로 밀림 효과
   );
+
 
 
   /// ✅ 마지막 페이지 체크박스
