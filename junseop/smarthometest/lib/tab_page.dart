@@ -346,8 +346,8 @@ class _TabPageState extends State<TabPage> {
 
                 if (confirm == true) {
                   try {
-                    // userProvider.clearUser();
-                    // kakaoUserProvider.clearUser();
+                    userProvider.clearUser();
+                    kakaoUserProvider.clearUser();
                     await Navigator.pushNamedAndRemoveUntil(
                         context, LoginPage.routeName, (route) => false);
                     showToast("로그아웃");

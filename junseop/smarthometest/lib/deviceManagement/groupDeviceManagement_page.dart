@@ -517,7 +517,10 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
       // ),
       floatingActionButton: _showFab
           ? FloatingActionButton(
-        onPressed: _createGroupName,
+        onPressed:() {
+          _createGroupName();
+          HapticFeedback.lightImpact();
+        },
         backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.9),
         foregroundColor: Theme.of(context).colorScheme.onSecondary,
         child:  Icon(Icons.add, color: Theme.of(context).colorScheme.surface,),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart'; // fl_chart 패키지 import
+import 'package:intl/intl.dart';
+import 'package:smarthometest/request/graph_request.dart'; // fl_chart 패키지 import
 
 class MainPage extends StatefulWidget {
   static String routeName = "/MainPage";
@@ -25,9 +26,10 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _fetchEstimatedCostAndUsage();
-    _fetchMostPowerConsumingDevice();
     _fetchDevicePowerData();
   }
+
+
 
   void _fetchEstimatedCostAndUsage() {
     setState(() {
@@ -38,22 +40,26 @@ class _MainPageState extends State<MainPage> {
 
   void _fetchMostPowerConsumingDevice() {
     setState(() {
-      mostPowerConsumingDevice = "냉장고"; // 임시 데이터
-      mostPowerConsumingDeviceUsage = 10.0; // 임시 데이터
-      mostPowerConsumingDeviceCost = mostPowerConsumingDeviceUsage * 200; // 임시 데이터
+      // mostPowerConsumingDevice = "냉장고"; // 임시 데이터
+      // mostPowerConsumingDeviceUsage = 10.0; // 임시 데이터
+      // mostPowerConsumingDeviceCost = mostPowerConsumingDeviceUsage * 200; // 임시 데이터
     });
   }
 
-  void _fetchDevicePowerData() {
-    // 실제로는 API나 DB에서 값을 받아오겠지만, 지금은 예시 데이터
+  void _fetchDevicePowerData() async {
+    final List<Map<String, dynamic>> result = await getMainPieData(context);
+
     setState(() {
-      deviceData = [
-        DevicePowerData('냉장고', 10.0), // 임시 데이터
-        DevicePowerData('에어컨', 5.0),  // 임시 데이터
-        DevicePowerData('세탁기', 3.0),  // 임시 데이터
-        DevicePowerData('조명', 2.0),    // 임시 데이터
-        DevicePowerData('기타', 4.0),    // 임시 데이터
-      ];
+      deviceData = result
+          .map((e) => DevicePowerData(e['name'], e['powerUsage']))
+          .toList();
+
+      // 가장 전력 많이 먹는 기기 갱신
+      if (deviceData.isNotEmpty) {
+        mostPowerConsumingDevice = deviceData.first.name;
+        mostPowerConsumingDeviceUsage = deviceData.first.powerUsage;
+        mostPowerConsumingDeviceCost = mostPowerConsumingDeviceUsage * 105; // 단가는 상황에 따라 조정
+      }
     });
   }
 
@@ -239,6 +245,7 @@ class _MainPageState extends State<MainPage> {
   ///전기먹는 하마
   Widget _buildPowerConsumingDeviceSection() {
     final formatter = NumberFormat('#,###'); // 쉼표 포맷 생성
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Container(
@@ -249,17 +256,17 @@ class _MainPageState extends State<MainPage> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15), // 살짝 더 진하게
-              blurRadius: 16,    // 흐림 정도를 높임 → 더 부드러운 경계
-              spreadRadius: 1,   // 그림자 넓이를 약간 확장
-              offset: Offset(0, 6), // 아래쪽으로 더 띄우는 느낌
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
+              blurRadius: 16,
+              spreadRadius: 1,
+              offset: Offset(0, 6),
             ),
-
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 타이틀
             Row(
               children: [
                 Icon(
@@ -279,43 +286,67 @@ class _MainPageState extends State<MainPage> {
               ],
             ),
             SizedBox(height: 10),
-            _buildPowerUsagePieChart(),
-            Text(
-              mostPowerConsumingDevice,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface,
+
+            // 데이터 유무에 따라 내용 분기
+            if (mostPowerConsumingDeviceUsage == 0) ...[
+              SizedBox(height: 20),
+              // 👇 고정 높이로 공간 확보
+              SizedBox(
+                height: 220, // PieChart + 텍스트 영역 대체
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.energy_savings_leaf, size: 48, color: Colors.grey),
+                      SizedBox(height: 12),
+                      Text(
+                        "사용 데이터가 부족합니다",
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Text(
-                  "₩${formatter.format(mostPowerConsumingDeviceCost)}",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+            ]
+            else ...[
+              _buildPowerUsagePieChart(),
+              Text(
+                mostPowerConsumingDevice,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
-
-                SizedBox(width: 10),
-                Text(
-                  "/ ${mostPowerConsumingDeviceUsage.toStringAsFixed(2)} kWh",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Text(
+                    "₩${formatter.format(mostPowerConsumingDeviceCost)}",
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
-                ),
-              ],
-            ),
+                  SizedBox(width: 10),
+                  Text(
+                    "/ ${mostPowerConsumingDeviceUsage.toStringAsFixed(2)} kWh",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ]
           ],
         ),
       ),
     );
   }
+
 
   ///파이차트
   Widget _buildPowerUsagePieChart() {
@@ -323,37 +354,40 @@ class _MainPageState extends State<MainPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final double totalPowerUsage = deviceData.fold(0.0, (sum, data) => sum + data.powerUsage);
+    final double totalPowerUsage =
+    deviceData.fold(0.0, (sum, data) => sum + data.powerUsage);
 
     return SizedBox(
-      height: 250,
+      height: 300,
       child: PieChart(
         PieChartData(
           sections: deviceData.asMap().entries.map((entry) {
             final index = entry.key;
             final device = entry.value;
-
             final percentage = device.powerUsage / totalPowerUsage * 100;
 
             return PieChartSectionData(
-              color: _getThemeColorByIndex(index),
+              color: device.name == '기타'
+                  ? Colors.grey
+                  : _getThemeColorByIndex(index),
               value: percentage,
               title: '${device.name}\n${percentage.toStringAsFixed(1)}%',
-              radius: 60,
-              titleStyle:  TextStyle(
-                fontSize: 12,
+              radius: 80,
+              titleStyle: TextStyle(
+                fontSize: percentage < 5 ? 8 : 12,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             );
           }).toList(),
           borderData: FlBorderData(show: false),
-          sectionsSpace: 0,
-          centerSpaceRadius: 40,
+          sectionsSpace: 2,
+          centerSpaceRadius: 60, // 여기! 이 값을 크게 하면 링 차트처럼 보임
         ),
       ),
     );
   }
+
 
   Color _getThemeColorByIndex(int index) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -361,9 +395,9 @@ class _MainPageState extends State<MainPage> {
     final colorList = [
       colorScheme.primary,          // 밝은 primary
       colorScheme.primary.withOpacity(0.8),        // 밝은 secondary
-      colorScheme.primary.withOpacity(0.6),
-      colorScheme.primary.withOpacity(0.4),
+      colorScheme.primary.withOpacity(0.5),
       colorScheme.primary.withOpacity(0.2),
+      colorScheme.primary.withOpacity(0.1),
       Colors.lightGreen.shade100,
       Colors.cyan.shade100,
     ];
