@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../request/advice_requests.dart';
 import '../../request/graph_request.dart';
@@ -124,6 +125,7 @@ class _MonthGraphState extends State<MonthGraph> {
 
   @override
   Widget build(BuildContext context) {
+    LineBarSpot? _previousSpot;
     double maxEnergy = energyData.isNotEmpty
         ? energyData.fold(0.0, (prev, e) => prev > e["electricalEnergy"] ? prev : e["electricalEnergy"]) + 5
         : 10.0;
@@ -158,6 +160,26 @@ class _MonthGraphState extends State<MonthGraph> {
               LineChartData(
                 backgroundColor: Theme.of(context).colorScheme.surface,
                 lineTouchData: LineTouchData(
+                  touchCallback: (FlTouchEvent event, LineTouchResponse? response) {
+                    if (response != null &&
+                        response.lineBarSpots != null &&
+                        response.lineBarSpots!.isNotEmpty) {
+                      final currentSpot = response.lineBarSpots!.first;
+
+                      // 처음 터치하거나 다른 포인트로 이동했을 때만 진동
+                      if (_previousSpot == null ||
+                          _previousSpot!.x != currentSpot.x ||
+                          _previousSpot!.y != currentSpot.y) {
+                        HapticFeedback.lightImpact();
+                        _previousSpot = currentSpot;
+                      }
+
+                      // 손 떼면 초기화
+                      if (event is FlPanEndEvent || event is FlLongPressEnd || event is FlTapUpEvent) {
+                        _previousSpot = null;
+                      }
+                    }
+                  },
                   touchTooltipData: LineTouchTooltipData(
                     getTooltipColor: (touchedSpot) {
                       return Theme.of(context).colorScheme.primary.withOpacity(0.9);

@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../request/advice_requests.dart';
 import '../../request/graph_request.dart';
@@ -132,6 +133,7 @@ class _DeviceGraphState extends State<DeviceGraph> {
 
   @override
   Widget build(BuildContext context) {
+    int? _previousBarGroupIndex;
     double maxEnergy = energyData.isNotEmpty
         ? energyData.map((e) => e["usage"] as double).reduce((a, b) => a > b ? a : b) + 0.5
         : 1.0;
@@ -224,6 +226,21 @@ class _DeviceGraphState extends State<DeviceGraph> {
                   topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 barTouchData: BarTouchData(
+
+                  touchCallback: (FlTouchEvent event, BarTouchResponse? response) {
+                    if (response != null && response.spot != null) {
+                      final currentIndex = response.spot!.touchedBarGroupIndex;
+
+                      if (_previousBarGroupIndex != currentIndex) {
+                        HapticFeedback.lightImpact();
+                        _previousBarGroupIndex = currentIndex;
+                      }
+
+                      if (event is FlTapUpEvent || event is FlPanEndEvent) {
+                        _previousBarGroupIndex = null;
+                      }
+                    }
+                  },
                   touchTooltipData: BarTouchTooltipData(
                     getTooltipColor: (touchedSpot) {
                       return Theme.of(context).colorScheme.primary.withOpacity(0.9);

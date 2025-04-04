@@ -1,12 +1,5 @@
 import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:smarthometest/toastMessage.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-
 import '../dioRequest.dart';
 
 ///일별 전력량 요청
@@ -45,20 +38,19 @@ Future<List<Map<String, dynamic>>> getDayDeviceEData(BuildContext context, Strin
     print("오케이");
     print(response);
     List<dynamic> data = jsonDecode(response?.data);
-
     // 날짜기준 오름차순
-    data.sort((a, b) => DateTime.parse(a['t']).compareTo(DateTime.parse(b['t'])));
+    data.sort((a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])));
 
 
     List<Map<String, dynamic>> dayDeviceList = data.map((item) {
       // "t"는 "2025-03-14 00:00:00" 형식으로 되어있으므로 DateTime으로 변환
-      DateTime dateTime = DateTime.parse(item['t']);
+      DateTime dateTime = DateTime.parse(item['date']);
       // 날짜를 "MM/dd" 형식으로 변환
       String formattedDate = "${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}";
 
       return {
         "date": formattedDate,
-        "electricalEnergy": item['value']
+        "electricalEnergy": item['usage']
       };
     }).toList();
 
@@ -69,68 +61,6 @@ Future<List<Map<String, dynamic>>> getDayDeviceEData(BuildContext context, Strin
   }
 }
 
-
-// List<Map<String, dynamic>> getMonthEData() {
-//   ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-//   List<Map<String, dynamic>> data = [
-//     {
-//       'month': "Jan",
-//       'electricalEnergy': 450
-//     },
-//     {
-//       'month': "Feb", // 겨울
-//       'electricalEnergy': 420 // 난방기 사용 지속
-//     },
-//     {
-//       'month': "Mar", // 초봄
-//       'electricalEnergy': 320 // 난방 사용 감소
-//     },
-//     {
-//       'month': "Apr", // 봄
-//       'electricalEnergy': 350 // 온화한 날씨로 전력 소비 감소
-//     },
-//     {
-//       'month': "May", // 늦봄
-//       'electricalEnergy': 400 // 날씨가 따뜻해지며 소비량 약간 증가
-//     },
-//     {
-//       'month': "Jun", // 초여름
-//       'electricalEnergy': 500 // 에어컨 사용 시작으로 소비량 증가
-//     },
-//     {
-//       'month': "Jul", // 여름
-//       'electricalEnergy': 600 // 에어컨 사용량 최대치
-//     },
-//     {
-//       'month': "Aug", // 여름
-//       'electricalEnergy': 600 // 여전히 높은 에어컨 사용량
-//     },
-//     {
-//       'month': "Sep", // 초가을
-//       'electricalEnergy': 550 // 에어컨 사용량 감소
-//     },
-//     {
-//       'month': "Oct", // 가을
-//       'electricalEnergy': 350 // 온화한 날씨로 소비량 감소
-//     },
-//     {
-//       'month': "Nov", // 늦가을
-//       'electricalEnergy': 400 // 난방기 사용 시작
-//     },
-//     {
-//       'month': "Dec", // 겨울
-//       'electricalEnergy': 480 // 난방 사용으로 소비량 증가
-//     },
-//   ];
-
-//   List<Map<String, dynamic>> monthList = data.map((item) {
-//     return {
-//       "month": item['month'],
-//       "electricalEnergy": item['electricalEnergy']
-//     };
-//   }).toList();
-//   return monthList;
-// }
 ///월별 전력량 요청
 Future<List<Map<String, dynamic>>> getMonthEData(BuildContext context) async {
   final response = await dioRequest("GET", "/usage/month", context: context);

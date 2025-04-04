@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smarthometest/request/group_request.dart';
 
 import '../../request/advice_requests.dart';
@@ -28,25 +29,16 @@ class _DayGraphState extends State<DayGraph> {
   }
 
   Future<void> _initializeData() async {
-    await fetchDeviceData();
-    await fetchAdviceData();
-    await fetchDayData(); // 기본적으로 "전체" 데이터를 가져옵니다.
-  }
-
-  Future<void> fetchAdviceData() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      Map<String, dynamic> data = await getAdvice(context, "day");
-      setState(() {
-        // _adviceData = data;
-        // _adviceData = {"advice" : "최근 일주일 중 사용량이 높은 날(23일·27일)을 기준으로 고소비 기기 사용 시간대를 줄이면 전력 절감에 효과적이에요."};
-
-      });
+      await fetchDeviceData();
+      await fetchAdviceData();
+      await fetchDayData();
     } catch (e) {
-      print("Error fetching advice: $e");
+      print("초기 데이터 로딩 에러: $e");
     } finally {
       setState(() {
         _isLoading = false;
@@ -54,11 +46,21 @@ class _DayGraphState extends State<DayGraph> {
     }
   }
 
-  Future<void> fetchDayData() async {
-    setState(() {
-      _isLoading = true;
-    });
 
+  Future<void> fetchAdviceData() async {
+    try {
+      Map<String, dynamic> data = await getAdvice(context, "day");
+      setState(() {
+        // _adviceData = data;
+        _adviceData = {"advice" : "최근 일주일 중 사용량이 높은 날(23일·27일)을 기준으로 고소비 기기 사용 시간대를 줄이면 전력 절감에 효과적이에요."};
+
+      });
+    } catch (e) {
+      print("Error fetching advice: $e");
+    }
+  }
+
+  Future<void> fetchDayData() async {
     try {
       List<Map<String, dynamic>> data = await getDayEData(context);
       setState(() {
@@ -66,18 +68,10 @@ class _DayGraphState extends State<DayGraph> {
       });
     } catch (e) {
       print("Error fetching day data: $e");
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
   Future<void> fetchDayDeviceData(String deviceId) async {
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
       List<Map<String, dynamic>> data = await getDayDeviceEData(context, deviceId);
       setState(() {
@@ -86,10 +80,6 @@ class _DayGraphState extends State<DayGraph> {
       });
     } catch (e) {
       print("Error fetching device data: $e");
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -123,8 +113,9 @@ class _DayGraphState extends State<DayGraph> {
 
   Widget adviceWidget() {
 
-    // String advice = _adviceData['advice'] ?? '';
-    String advice = '';
+    String advice = _adviceData['advice'] ?? '조언을 불러오지 못했습니다.';
+    print("💡 adviceData: $_adviceData");
+    // // String advice = '';
     if(advice == '') { return const SizedBox.shrink(); }
 
 
@@ -291,24 +282,36 @@ class _DayGraphState extends State<DayGraph> {
 
             setState(() {
               _choiceDevice = newValue;
+              HapticFeedback.selectionClick();
+              // _isLoading = true; // 로딩 시작
             });
 
-            if (newValue == "전체") {
-              await fetchDayData();
-            } else {
-              final selectedDevice = _deviceData.firstWhere(
-                    (device) => device["name"] == newValue,
-                orElse: () => {},
-              );
-              final deviceId = selectedDevice["id"];
-              if (deviceId != null) {
-                print("fetchDayDeviceData 요청 시작한다");
-                await fetchDayDeviceData(deviceId.toString());
+            try {
+              if (newValue == "전체") {
+                await fetchDayData();
+              } else {
+                final selectedDevice = _deviceData.firstWhere(
+                      (device) => device["name"] == newValue,
+                  orElse: () => {},
+                );
+                final deviceId = selectedDevice["id"];
+                if (deviceId != null) {
+                  await fetchDayDeviceData(deviceId.toString());
+                }
               }
+
+              await fetchAdviceData(); // 👉 조언도 같이 새로 받아오기
+            } catch (e) {
+              print("드롭다운 선택 처리 중 오류: $e");
+            } finally {
+              // setState(() {
+              //   _isLoading = false; // 로딩 끝
+              // });
             }
           },
+
           items: [
-            const DropdownMenuItem<String>(
+             DropdownMenuItem<String>(
               value: "전체",
               child: Text("전체"),
             ),
@@ -326,7 +329,29 @@ class _DayGraphState extends State<DayGraph> {
 
   /// 차트 터치 데이터
   LineTouchData _buildLineTouchData() {
+    LineBarSpot? _previousSpot;
     return LineTouchData(
+
+      touchCallback: (FlTouchEvent event, LineTouchResponse? response) {
+        if (response != null &&
+            response.lineBarSpots != null &&
+            response.lineBarSpots!.isNotEmpty) {
+          final currentSpot = response.lineBarSpots!.first;
+
+          // 처음 터치하거나 다른 포인트로 이동했을 때만 진동
+          if (_previousSpot == null ||
+              _previousSpot!.x != currentSpot.x ||
+              _previousSpot!.y != currentSpot.y) {
+            HapticFeedback.lightImpact();
+            _previousSpot = currentSpot;
+          }
+
+          // 손 떼면 초기화
+          if (event is FlPanEndEvent || event is FlLongPressEnd || event is FlTapUpEvent) {
+            _previousSpot = null;
+          }
+        }
+      },
       touchTooltipData: LineTouchTooltipData(
         getTooltipColor: (touchedSpot) => Theme.of(context).colorScheme.primary.withOpacity(0.9),
         fitInsideHorizontally: true,

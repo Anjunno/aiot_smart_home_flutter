@@ -161,6 +161,7 @@ class _TabPageState extends State<TabPage> {
           // ),
           IconButton(
             onPressed: () {
+              HapticFeedback.lightImpact();
               setState(() {
                 _notificationsEnabled = !_notificationsEnabled;
                 _saveNotificationState(_notificationsEnabled);
@@ -178,6 +179,7 @@ class _TabPageState extends State<TabPage> {
           ),
           IconButton(
             onPressed: () {
+              HapticFeedback.lightImpact();
               setState(() {
                 MyApp.themeNotifier.value =
                 MyApp.themeNotifier.value == ThemeMode.light
@@ -410,6 +412,7 @@ class _TabPageState extends State<TabPage> {
 
   void _onItemTapped(int index) {
     setState(() {
+      HapticFeedback.lightImpact();
       _selectedIndex = index;
     });
     _pageController.animateToPage(index,

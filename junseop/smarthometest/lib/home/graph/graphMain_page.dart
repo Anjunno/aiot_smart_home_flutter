@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smarthometest/home/graph/dayGraph.dart';
 import 'package:smarthometest/main_page.dart';
 import 'package:smarthometest/home/graph/monthGraph.dart';
@@ -18,7 +19,9 @@ class GraphMainPage extends StatelessWidget {
             children: [
 
               // 탭바를 바로 최상단에 위치시킴
-              const TabBar(
+              TabBar(
+                onTap: (index) {HapticFeedback.lightImpact();},
+
                 // labelColor: Colors.blue,
                 // unselectedLabelColor: Colors.grey,
                 // indicatorColor: Colors.blue,

@@ -567,6 +567,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
               elevation: 3,
               child: InkWell(
                 onTap: () async {
+                  HapticFeedback.lightImpact();
                   List<Map<String, dynamic>> groupAction = await groupActionCheck(context, _groups[index]["groupId"]);
 
                   showDialog(
@@ -702,8 +703,10 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                           _buildIconButton(
                             icon: Icons.edit,
                             tooltip: "그룹 설정",
-                            onTap: () => _showAddGroupDialog(group["groupId"].toString()),
-                          ),
+                            onTap: () =>
+                            {
+                              _showAddGroupDialog(group["groupId"].toString()),
+                              HapticFeedback.lightImpact()}),
                           _buildIconButton(
                             icon: Icons.play_arrow,
                             tooltip: "실행",
@@ -722,6 +725,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                             icon: Icons.delete,
                             tooltip: "삭제",
                             onTap: () async {
+                              HapticFeedback.vibrate();
                               await _showDeleteConfirmationDialog(
                                 context,
                                 group["groupName"],

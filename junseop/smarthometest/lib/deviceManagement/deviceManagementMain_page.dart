@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smarthometest/deviceManagement/deviceManagement_page.dart';
 import 'groupDeviceManagement_page.dart';
 
@@ -14,7 +15,9 @@ class DevicemanagementmainPage extends StatelessWidget {
           child: Column(
             children: [
               // 탭바를 바로 최상단에 위치시킴
-              const TabBar(
+               TabBar(
+                onTap: (index) {
+                  HapticFeedback.lightImpact();},
                 // labelColor: Colors.blue,
                 // unselectedLabelColor: Colors.grey,
                 // indicatorColor: Colors.blue,
@@ -22,6 +25,7 @@ class DevicemanagementmainPage extends StatelessWidget {
                   Tab(text: '기기제어'),
                   Tab(text: '그룹 기기제어'),
                 ],
+
               ),
               // 나머지 내용 (탭 뷰)
               const Expanded(

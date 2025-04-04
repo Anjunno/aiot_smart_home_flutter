@@ -169,7 +169,10 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
                   final isOnline = device['online'];
 
                   return InkWell(
-                    onTap: () => _showDeviceDialog(device, index),
+                    onTap: () => {
+                      _showDeviceDialog(device, index),
+                      HapticFeedback.lightImpact()
+                    },
                     child: Card(
                       color: Theme.of(context).colorScheme.surfaceContainer,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
