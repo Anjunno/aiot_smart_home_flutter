@@ -300,7 +300,7 @@ class _DayGraphState extends State<DayGraph> {
                 }
               }
 
-              await fetchAdviceData(); // 👉 조언도 같이 새로 받아오기
+              // await fetchAdviceData(); // 👉 조언도 같이 새로 받아오기
             } catch (e) {
               print("드롭다운 선택 처리 중 오류: $e");
             } finally {

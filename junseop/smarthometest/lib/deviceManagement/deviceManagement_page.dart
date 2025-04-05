@@ -71,28 +71,42 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
               Expanded(child: Text(device['name'], style: TextStyle(fontWeight: FontWeight.bold))),
             ],
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildInfoRow(Icons.numbers, '기기 ID', device['id'], color: Theme.of(context).colorScheme.onSurface),
-              _buildInfoRow(Icons.electric_bolt, '현재 전압', '${device['curVoltage']}V', color: Theme.of(context).colorScheme.onSurface),
-              _buildInfoRow(Icons.power, '현재 전력', '${device['curPower']}W', color: Theme.of(context).colorScheme.onSurface),
-              _buildInfoRow(Icons.electric_meter, '현재 전류', '${device['curCurrent']}mA', color: Theme.of(context).colorScheme.onSurface),
-              _buildInfoRow(
-                device['online'] ? Icons.wifi : Icons.wifi_off,
-                '온라인 상태',
-                device['online'] ? '온라인' : '오프라인',
-                color: device['online'] ? Colors.green : Colors.red,
-              ),
-              _buildInfoRow(
-                _deviceStates[index] ? Icons.toggle_on : Icons.toggle_off,
-                '전원 상태',
-                _deviceStates[index] ? '켜짐' : '꺼짐',
-                color: _deviceStates[index] ? Colors.green : Colors.red,
-              ),
-            ],
+          content: Container(
+            decoration: BoxDecoration(
+              color: device['online']
+                  ? Theme.of(context).colorScheme.primary.withOpacity(0.05)
+                  : Theme.of(context).colorScheme.error.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildInfoRow(Icons.numbers, '기기 ID', device['id'],
+                    color: Theme.of(context).colorScheme.onSurface),
+                _buildInfoRow(Icons.electric_bolt, '현재 전압', '${device['curVoltage']}V',
+                    color: Theme.of(context).colorScheme.onSurface),
+                _buildInfoRow(Icons.power, '현재 전력', '${device['curPower']}W',
+                    color: Theme.of(context).colorScheme.onSurface),
+                _buildInfoRow(Icons.electric_meter, '현재 전류', '${device['curCurrent']}mA',
+                    color: Theme.of(context).colorScheme.onSurface),
+                _buildInfoRow(
+                  device['online'] ? Icons.wifi : Icons.wifi_off,
+                  '온라인 상태',
+                  device['online'] ? '온라인' : '오프라인',
+                  color: device['online'] ? Colors.green : Colors.red,
+                ),
+                _buildInfoRow(
+                  _deviceStates[index] ? Icons.toggle_on : Icons.toggle_off,
+                  '전원 상태',
+                  _deviceStates[index] ? '켜짐' : '꺼짐',
+                  color: _deviceStates[index] ? Colors.green : Colors.red,
+                ),
+              ],
+            ),
           ),
-          actions: [
+
+            actions: [
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(),
               style: ElevatedButton.styleFrom(

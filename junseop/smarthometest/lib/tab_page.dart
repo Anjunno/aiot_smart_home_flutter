@@ -84,47 +84,69 @@ class _TabPageState extends State<TabPage> {
 
     return WillPopScope(
         onWillPop: () async {
-          final shouldExit = await showDialog<bool>(
+          final shouldExit = await showModalBottomSheet<bool>(
             context: context,
-            barrierColor: Colors.black.withOpacity(0.5), // 🔹 배경 투명도 조절
-            builder: (context) => AlertDialog(
-              title: const Text("앱 종료"),
-              content: const Text("앱을 종료하시겠습니까?"),
-              actionsPadding: const EdgeInsets.only(bottom: 12, right: 12),
-              backgroundColor: Theme.of(context).colorScheme.surface, // 다이얼로그 본문 배경도 커스텀 가능
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              actions: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            builder: (context) => Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "깜빡을 종료하시겠어요?",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "앱이 완전히 종료됩니다.\n다시 사용하려면 재실행해야 해요.",
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text("취소"),
                         ),
                       ),
-                      child:  Text("취소", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text("앱 종료"),
                         ),
                       ),
-                      child:  Text("확인", style: TextStyle(color:Theme.of(context).colorScheme.surface)),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
 
-      if (shouldExit == true) {
+
+          if (shouldExit == true) {
         SystemNavigator.pop(); // Android 종료
       }
 
@@ -306,57 +328,91 @@ class _TabPageState extends State<TabPage> {
                     fontSize: 16,
                     fontWeight: FontWeight.bold),
               ),
-              onTap: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    title: const Text("로그아웃"),
-                    content: const Text("정말 로그아웃하시겠습니까?"),
-                    actions: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                onTap: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ElevatedButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child:  Text("취소", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          Text(
+                            "로그아웃하시겠어요?",
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          const SizedBox(width: 10),
-                          ElevatedButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "현재 계정에서 로그아웃됩니다.\n다시 로그인하려면 아이디와 비밀번호가 필요해요.",
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                             ),
-                            child:  Text("확인", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
                           ),
+                          const SizedBox(height: 24),
                         ],
                       ),
-                    ],
-                  ),
-                );
+                      actions: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.of(context).pop(false),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: Theme.of(context).colorScheme.outline,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text("취소"),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () => Navigator.of(context).pop(true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
+                                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text("로그아웃"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
 
-                if (confirm == true) {
-                  try {
-                    userProvider.clearUser();
-                    kakaoUserProvider.clearUser();
-                    await Navigator.pushNamedAndRemoveUntil(
-                        context, LoginPage.routeName, (route) => false);
-                    showToast("로그아웃");
-                  } catch (e) {
-                    print("로그인 화면 전환 중 오류 발생: $e");
-                    showToast("로그아웃 중 오류가 발생했습니다.");
+                  if (confirm == true) {
+                    try {
+                      userProvider.clearUser();
+                      kakaoUserProvider.clearUser();
+                      await Navigator.pushNamedAndRemoveUntil(
+                          context, LoginPage.routeName, (route) => false);
+                      showToast("로그아웃");
+                    } catch (e) {
+                      print("로그인 화면 전환 중 오류 발생: $e");
+                      showToast("로그아웃 중 오류가 발생했습니다.");
+                    }
                   }
                 }
-              },
+
+
+
+
+
+
+
+
+
 
             ),
           ],

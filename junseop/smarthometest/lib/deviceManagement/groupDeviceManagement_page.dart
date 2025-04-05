@@ -93,34 +93,66 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
         return AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text("삭제 확인", style: TextStyle(fontWeight: FontWeight.bold)),
-          content: Text("그룹 \"$groupName\"을(를) 정말 삭제하시겠습니까?"),
+          contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "삭제 확인",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "\"$groupName\"을(를) 정말 삭제하시겠습니까?",
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
           actions: [
-            ElevatedButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () => Navigator.of(context).pop(), // 취소
-              child: Text("취소", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () async {
-                Navigator.of(context).pop(); // 먼저 다이얼로그 닫고
-                await groupDelete(context, groupId); // 삭제 실행
-                await _loadGroups(); // 목록 갱신
-              },
-              child:  Text("삭제", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                    ),
+                    child: Text(
+                      "취소",
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      await groupDelete(context, groupId);
+                      await _loadGroups();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text("삭제"),
+                  ),
+                ),
+              ],
             ),
           ],
         );
       },
     );
   }
+
 
 
   //⭐ 그룹 이름 추가 ⭐
@@ -135,40 +167,60 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 5,
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("그룹 추가", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                Text("그룹으로 사용할 이름을 추가해주세요. ", style: TextStyle(fontSize: 16, color: Colors.grey)),
-                const SizedBox(height: 15),
+                Text(
+                  "그룹 추가",
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "그룹으로 사용할 이름을 입력해주세요.",
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextField(
                   controller: _groupNameController,
                   decoration: InputDecoration(
                     labelText: "그룹 이름",
-                    labelStyle:  TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    labelStyle: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    ElevatedButton(
+                    OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+                      style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        side: BorderSide(color: Theme.of(context).colorScheme.outline),
                       ),
-                      child:  Text("취소", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                      child: Text(
+                        "취소",
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     ElevatedButton(
                       onPressed: () async {
                         final groupName = _groupNameController.text.trim();
@@ -182,9 +234,10 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child:  Text("확인", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
+                      child: const Text("확인"),
                     ),
                   ],
                 ),
@@ -194,6 +247,7 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
         );
       },
     );
+
   }
 
   // ⭐ 그룹 액션 결과 Dialog ⭐
