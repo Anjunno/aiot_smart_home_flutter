@@ -25,41 +25,56 @@ class _MonthGraphState extends State<MonthGraph> {
 
   Future<void> initializeData() async {
     await fetchMonthData();
-    await fetchAdviceData();
+    // await fetchAdviceData();
   }
 
   ///조언 데이터 불러오기
-  Future<void> fetchAdviceData() async {
+  // Future<void> fetchAdviceData() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //
+  //   try {
+  //     Map<String, dynamic> data = await getAdvice(context, "day");
+  //     setState(() {
+  //       // _adviceData = data;
+  //       _adviceData = {"advice" : "최근 전력 사용이 급증하고 있어요!\n난방기기와 대기전력 기기의 사용 시간을 줄이면 전기료를 크게 절감할 수 있어요."};
+  //     });
+  //   } catch (e) {
+  //     print("Error fetching advice: $e");
+  //   } finally {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
+  Future<void> fetchMonthData() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      Map<String, dynamic> data = await getAdvice(context, "day");
+      final result = await getMonthEData(context);
+
+      List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(result['monthUsage']);
+      data.sort((a, b) => a['month'].compareTo(b['month']));
+
       setState(() {
-        // _adviceData = data;
-        _adviceData = {"advice" : "최근 전력 사용이 급증하고 있어요!\n난방기기와 대기전력 기기의 사용 시간을 줄이면 전기료를 크게 절감할 수 있어요."};
+        energyData = data;
+        _adviceData = {
+          "advice": result['advice'] ?? "조언이 없습니다.",
+        };
+        _isLoading = false;
       });
     } catch (e) {
-      print("Error fetching advice: $e");
-    } finally {
+      print("Error fetching month data: $e");
       setState(() {
         _isLoading = false;
       });
     }
   }
 
-  Future<void> fetchMonthData() async {
-    List<Map<String, dynamic>> data = await getMonthEData(context);
-
-    // 날짜를 기준으로 정렬 (오름차순)
-    data.sort((a, b) => a['month'].compareTo(b['month']));
-
-    setState(() {
-      energyData = data;
-      _isLoading = false; // 로딩 완료
-    });
-  }
 
   List<FlSpot> getChartData() {
     return energyData.asMap().entries.map((entry) {

@@ -479,47 +479,60 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                 ),
               ),
               actions: [
-                // 취소 버튼
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child:  Text("취소", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-                ),
-                // 확인 버튼
-
-                ElevatedButton(
-                  onPressed: () async {
-                    // 선택된 기기 목록 저장
-                    List<Map<String, dynamic>> selectedDevices = _devices
-                        .where((device) => deviceSelection[device['id']] == true)
-                        .map((device) => {
-                          "plugId": device['id'],
-                      "action": deviceState[device['id']]
-                        }).toList();
-                    if (selectedDevices.isEmpty) {
-                      // 체크된 기기가 없을 경우 토스트 메시지 표시
-                      showToast("최소 하나의 기기를 설정해주세요.", gravity: ToastGravity.CENTER);
-                      return;  // 함수 종료
-                    }
-                    print("액션설정\n" + selectedDevices.toString());
-                    groupData = {
-                      "groupId": groupId,
-                      "devices": selectedDevices,
-                    };
-                    setState(() {
-                      print(groupData); // 디버깅용 출력
-                    });
-                    await groupAction(context, groupData);
-                    Navigator.pop(context);
-                    },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child:  Text("확인", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text("취소"),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          // 선택된 기기 목록 저장
+                          List<Map<String, dynamic>> selectedDevices = _devices
+                              .where((device) => deviceSelection[device['id']] == true)
+                              .map((device) => {
+                            "plugId": device['id'],
+                            "action": deviceState[device['id']]
+                          }).toList();
+                          if (selectedDevices.isEmpty) {
+                            // 체크된 기기가 없을 경우 토스트 메시지 표시
+                            showToast("최소 하나의 기기를 설정해주세요.", gravity: ToastGravity.CENTER);
+                            return;  // 함수 종료
+                          }
+                          print("액션설정\n" + selectedDevices.toString());
+                          groupData = {
+                            "groupId": groupId,
+                            "devices": selectedDevices,
+                          };
+                          setState(() {
+                            print(groupData); // 디버깅용 출력
+                          });
+                          await groupAction(context, groupData);
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text("확인"),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -715,13 +728,16 @@ class _GroupDevicemanagementPageState extends State<GroupDevicemanagementPage> {
                         ),
                         actions: [
 
-                          ElevatedButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child:  Text("닫기", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
                             ),
-                            child:  Text("닫기", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
                           ),
                         ],
                       );

@@ -26,23 +26,45 @@ class _DeviceGraphState extends State<DeviceGraph> {
 
   Future<void> _initializeData() async {
     await fetchDeviceData();
-    await fetchAdviceData();
+    // await fetchAdviceData();
   }
 
   ///조언 데이터 불러오기
-  Future<void> fetchAdviceData() async {
+  // Future<void> fetchAdviceData() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //
+  //   try {
+  //     Map<String, dynamic> data = await getAdvice(context, "day");
+  //     setState(() {
+  //       // _adviceData = data;
+  //       _adviceData = {"advice" : "이번 주 전체 전력의 75% 이상이 컴퓨터 본체와 모니터에서 나왔어요! 평소 사용 후 전원 OFF 또는 절전 모드를 적극 활용해보세요"};
+  //     });
+  //   } catch (e) {
+  //     print("Error fetching advice: $e");
+  //   } finally {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
+  Future<void> fetchDeviceData() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      Map<String, dynamic> data = await getAdvice(context, "day");
+      final result = await getDeviceEData(context);
       setState(() {
-        // _adviceData = data;
-        _adviceData = {"advice" : "이번 주 전체 전력의 75% 이상이 컴퓨터 본체와 모니터에서 나왔어요! 평소 사용 후 전원 OFF 또는 절전 모드를 적극 활용해보세요"};
+        energyData = List<Map<String, dynamic>>.from(result['plugUsageData']);
+        _adviceData = {
+          "advice": result['advice'] ?? "조언이 없습니다.",
+        };
       });
     } catch (e) {
-      print("Error fetching advice: $e");
+      print("Error fetching device energy data: $e");
     } finally {
       setState(() {
         _isLoading = false;
@@ -50,13 +72,6 @@ class _DeviceGraphState extends State<DeviceGraph> {
     }
   }
 
-  Future<void> fetchDeviceData() async {
-    List<Map<String, dynamic>> data = await getDeviceEData(context);
-    setState(() {
-      energyData = data;
-      _isLoading = false; // 로딩 완료
-    });
-  }
 
   List<BarChartGroupData> getChartData() {
     return energyData.asMap().entries.map((entry) {

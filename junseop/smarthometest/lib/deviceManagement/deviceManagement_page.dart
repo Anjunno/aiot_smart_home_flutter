@@ -107,13 +107,16 @@ class _DevicemanagementPageState extends State<DevicemanagementPage> {
           ),
 
             actions: [
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child:  Text("확인", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
               ),
-              child:  Text("확인", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
             ),
           ],
         );

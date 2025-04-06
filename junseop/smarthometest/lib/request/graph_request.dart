@@ -54,148 +54,146 @@ Future<List<Map<String, dynamic>>> getMainPieData(BuildContext context) async {
 
 
 ///일별 전력량 요청
-Future<List<Map<String, dynamic>>> getDayEData(BuildContext context) async {
+Future<Map<String, dynamic>> getDayEData(BuildContext context) async {
   final response = await dioRequest("GET", "/usage/week", context: context);
 
   if (response?.statusCode == 200) {
     Map<String, dynamic> decoded = jsonDecode(response?.data);
-
     Map<String, dynamic> weekUsage = decoded['weekUsage'] ?? {};
 
     // 날짜 오름차순 정렬
     final sortedEntries = weekUsage.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
 
-    List<Map<String, dynamic>> dayList = sortedEntries.map((entry) {
+    // 날짜 포맷 변경 및 리스트 변환
+    List<Map<String, dynamic>> usageList = sortedEntries.map((entry) {
       List<String> dateParts = entry.key.split('-');
-      String formattedDate = "${int.parse(dateParts[1])}/${int.parse(dateParts[2])}";
+      String formattedDate = "${int.parse(dateParts[1])}/${int.parse(dateParts[2])}"; // MM/DD
 
       return {
         "date": formattedDate,
-        "electricalEnergy": (entry.value as num).toDouble(), // 숫자 변환 안전 처리
+        "electricalEnergy": (entry.value as num).toDouble(),
       };
     }).toList();
 
-    print("Filtered dayList: $dayList");
-    return dayList;
+    return {
+      "advice": decoded["advice"]?.toString().replaceAll('"', ''),
+      "electricalEnergy": usageList,
+    };
   } else {
-    return [];
+    return {
+      "advice": "",
+      "electricalEnergy": [],
+    };
   }
 }
 
 ///일별 단일기기 요청
-Future<List<Map<String, dynamic>>> getDayDeviceEData(BuildContext context, String deviceId) async {
+Future<Map<String, dynamic>> getDayDeviceEData(BuildContext context, String deviceId) async {
   print("일별 단일기기 요청 시작");
-  final response = await dioRequest("GET", "/usage/week/plug/" + deviceId, context: context);
+  final response = await dioRequest("GET", "/usage/week/plug/$deviceId", context: context);
 
   if (response?.statusCode == 200) {
     print("오케이");
-    print(response);
-    List<dynamic> data = jsonDecode(response?.data);
-    // 날짜기준 오름차순
+    Map<String, dynamic> decoded = jsonDecode(response?.data);
+
+    // usage가 문자열 형태의 JSON이므로 다시 디코딩
+    List<dynamic> data = jsonDecode(decoded['usage']);
+
+    // 날짜 기준 정렬
     data.sort((a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])));
 
-
     List<Map<String, dynamic>> dayDeviceList = data.map((item) {
-      // "t"는 "2025-03-14 00:00:00" 형식으로 되어있으므로 DateTime으로 변환
       DateTime dateTime = DateTime.parse(item['date']);
-      // 날짜를 "MM/dd" 형식으로 변환
-      String formattedDate = "${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}";
+      String formattedDate = "${dateTime.month}/${dateTime.day}";
 
       return {
         "date": formattedDate,
-        "electricalEnergy": item['usage']
+        "electricalEnergy": (item['usage'] as num).toDouble(),
       };
     }).toList();
 
-    print("dayDeviceList: $dayDeviceList");
-    return dayDeviceList;
+    return {
+      "advice": decoded["advice"]?.toString().replaceAll('"', ''),
+      "electricalEnergy": dayDeviceList,
+    };
   } else {
-    return [];
+    return {
+      "advice": "",
+      "electricalEnergy": [],
+    };
   }
 }
 
+
 ///월별 전력량 요청
-Future<List<Map<String, dynamic>>> getMonthEData(BuildContext context) async {
+Future<Map<String, dynamic>> getMonthEData(BuildContext context) async {
   final response = await dioRequest("GET", "/usage/month", context: context);
 
   if (response?.statusCode == 200) {
     // 응답 데이터 파싱
     Map<String, dynamic> decoded = jsonDecode(response?.data);
 
-    // message는 사용하지 않고 monthData만 추출
     Map<String, dynamic> monthData = decoded['monthData'] ?? {};
 
     // monthData Map → List<Map>으로 변환
     List<Map<String, dynamic>> monthList = monthData.entries.map((entry) {
       return {
-        "month": entry.key,
-        "electricalEnergy": (entry.value as num).toDouble(), // double 변환 안전하게 처리
+        "month": entry.key, // 예: "2024-12"
+        "electricalEnergy": (entry.value as num).toDouble(),
       };
     }).toList();
 
-    print("monthList: $monthList");
-    return monthList;
+    // 정렬이 필요하다면 (최신순/오름차순)
+    monthList.sort((a, b) => a["month"].compareTo(b["month"]));
+
+    return {
+      "advice": decoded["advice"]?.toString().replaceAll('"', '') ?? "",
+      "monthUsage": monthList,
+    };
   } else {
-    return [];
+    return {
+      "advice": "",
+      "monthUsage": [],
+    };
   }
 }
 
 
 
-///일별 전력량 요청
-// Future<List<Map<String, dynamic>>> getDayEData() async {
-//   final url = dotenv.get("URL");
-//   final storage = FlutterSecureStorage();
-//   final accessToken = await storage.read(key: 'ACCESS_TOKEN');
-//   final dio = Dio();
-//   final response = await dio.get(url + "/usage/week/plug");
-//   print("일별 요청할게");
-//   if (response.statusCode == 200) {
-//     List<dynamic> data = response.data as List<dynamic>;
-//     List<Map<String, dynamic>> dayList = data.map((item) {
-//       return {
-//         "date": item['date'],
-//         "electricalEnergy": item['usage']
-//       };
-//     }).toList();
-//
-//     print("dayList: $dayList");
-//     return dayList;
-//   } else {
-//     return [];
-//   }
-// }
-
 ///기기별 전력량 요청
-Future<List<Map<String, dynamic>>> getDeviceEData(BuildContext context) async {
+Future<Map<String, dynamic>> getDeviceEData(BuildContext context) async {
   final response = await dioRequest("GET", "/usage/week/groupPlug", context: context);
 
   if (response?.statusCode == 200) {
-    // 응답 데이터를 Map으로 파싱
-    Map<String, dynamic> data = jsonDecode(response?.data);
+    Map<String, dynamic> decoded = jsonDecode(response?.data);
 
-    // plugUsageData만 추출
-    List<dynamic> rawList = data['plugUsageData'];
+    List<dynamic> rawList = decoded['plugUsageData'] ?? [];
 
-    // usage가 0이 아닌 데이터만 필터링
+    // usage가 0이 아닌 항목만 필터링
     List<Map<String, dynamic>> deviceList = rawList.where((item) {
       return item['usage'] != 0;
     }).map<Map<String, dynamic>>((item) {
       return {
         "plugName": item['plugName'],
-        "usage": item['usage'],
-        "plugId": item['plugId']
+        "usage": (item['usage'] as num).toDouble(), // 안전한 double 변환
+        "plugId": item['plugId'],
       };
     }).toList();
 
     // usage 내림차순 정렬
     deviceList.sort((a, b) => b['usage'].compareTo(a['usage']));
 
-    print("Filtered plugList: $deviceList");
-    return deviceList;
+    return {
+      "advice": decoded['advice']?.toString().replaceAll('"', ''),
+      "plugUsageData": deviceList,
+    };
   } else {
-    return [];
+    return {
+      "advice": "",
+      "plugUsageData": [],
+    };
   }
 }
+
 

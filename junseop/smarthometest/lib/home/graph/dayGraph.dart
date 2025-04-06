@@ -35,7 +35,7 @@ class _DayGraphState extends State<DayGraph> {
 
     try {
       await fetchDeviceData();
-      await fetchAdviceData();
+      // await fetchAdviceData();
       await fetchDayData();
     } catch (e) {
       print("초기 데이터 로딩 에러: $e");
@@ -47,36 +47,44 @@ class _DayGraphState extends State<DayGraph> {
   }
 
 
-  Future<void> fetchAdviceData() async {
-    try {
-      Map<String, dynamic> data = await getAdvice(context, "day");
-      setState(() {
-        // _adviceData = data;
-        _adviceData = {"advice" : "최근 일주일 중 사용량이 높은 날(23일·27일)을 기준으로 고소비 기기 사용 시간대를 줄이면 전력 절감에 효과적이에요."};
-
-      });
-    } catch (e) {
-      print("Error fetching advice: $e");
-    }
-  }
+  // Future<void> fetchAdviceData() async {
+  //   try {
+  //     Map<String, dynamic> data = await getAdvice(context, "day");
+  //     setState(() {
+  //       // _adviceData = data;
+  //       _adviceData = {"advice" : "최근 일주일 중 사용량이 높은 날(23일·27일)을 기준으로 고소비 기기 사용 시간대를 줄이면 전력 절감에 효과적이에요."};
+  //
+  //     });
+  //   } catch (e) {
+  //     print("Error fetching advice: $e");
+  //   }
+  // }
 
   Future<void> fetchDayData() async {
     try {
-      List<Map<String, dynamic>> data = await getDayEData(context);
+      final summary = await getDayEData(context);
+
       setState(() {
-        _data = data;
+        _data = List<Map<String, dynamic>>.from(summary['electricalEnergy']);
+        _adviceData = {
+          'advice': summary['advice'] ?? '조언이 없습니다.',
+        };
       });
     } catch (e) {
-      print("Error fetching day data: $e");
+      print("Error fetching week summary: $e");
     }
   }
 
+
   Future<void> fetchDayDeviceData(String deviceId) async {
+    final summary = await getDayDeviceEData(context, deviceId);
     try {
-      List<Map<String, dynamic>> data = await getDayDeviceEData(context, deviceId);
+      // List<Map<String, dynamic>> data = await getDayDeviceEData(context, deviceId);
       setState(() {
-        print("주간단일기기 데이터는용 : $data");
-        _data = data;
+        _data = List<Map<String, dynamic>>.from(summary['electricalEnergy']);
+        // _adviceData = {
+        //   'advice': summary['advice'] ?? '조언이 없습니다.',
+        // };
       });
     } catch (e) {
       print("Error fetching device data: $e");
@@ -114,8 +122,6 @@ class _DayGraphState extends State<DayGraph> {
   Widget adviceWidget() {
 
     String advice = _adviceData['advice'] ?? '조언을 불러오지 못했습니다.';
-    print("💡 adviceData: $_adviceData");
-    // // String advice = '';
     if(advice == '') { return const SizedBox.shrink(); }
 
 
@@ -212,7 +218,7 @@ class _DayGraphState extends State<DayGraph> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _isLoading ? const SizedBox.shrink() : adviceWidget(),
+        (_isLoading || _data.isEmpty) ? const SizedBox.shrink() : adviceWidget(),
         Expanded(
           child: Stack(
             children: [

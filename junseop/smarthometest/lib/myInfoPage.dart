@@ -40,27 +40,31 @@ class MyInfoPage extends StatelessWidget {
                   const SizedBox(height: 16),
                   const _ProfileInfoRow(),
                   const SizedBox(height: 16),
-                  Container(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4)),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.arrow_back_ios),
-                            Text(
-                              '뒤로가기',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ],
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4)),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child:  Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.surface,),
+                              Text(
+                                '뒤로가기',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color:Theme.of(context).colorScheme.surface ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

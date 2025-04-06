@@ -33,8 +33,8 @@ class _MainPageState extends State<MainPage> {
 
   void _fetchEstimatedCostAndUsage() {
     setState(() {
-      estimatedElectricityCost = 12345.67; // 임시 데이터 //사용자 전기요금
-      actualElectricityUsage = 350.5; // 임시 데이터 //사용자 전력 사용량
+      estimatedElectricityCost = 17705; // 임시 데이터 //사용자 전기요금
+      actualElectricityUsage = 110; // 임시 데이터 //사용자 전력 사용량
     });
   }
 
@@ -68,8 +68,8 @@ class _MainPageState extends State<MainPage> {
   Widget _buildElectricityCostSection() {
     final formatter = NumberFormat('#,###');
     // 예시 데이터 (실제 데이터로 교체)
-    double estimatedElectricityCost = 15000.00; // 예상 전기요금
-    double actualElectricityUsage = 350; // 실제 사용량 (kWh)
+    double estimatedElectricityCost = 17705; // 예상 전기요금
+    double actualElectricityUsage = 110; // 실제 사용량 (kWh)
     double tierStart = 300; // 예시: 누진 구간 시작
     double tierEnd = 400; // 예시: 누진 구간 끝
 
@@ -194,9 +194,9 @@ class _MainPageState extends State<MainPage> {
                       triggerMode: TooltipTriggerMode.tap, // ⬅️ 터치만 해도 툴팁이 뜨도록 설정
                       preferBelow: false, // ⬅️ 위쪽에 툴팁 표시
                       child: Icon(
-                        Icons.flash_on,
-                        size: 24,
-                        color: Theme.of(context).colorScheme.primary,
+                        Icons.circle_rounded,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.surfaceContainer,
                         shadows: [
                           Shadow(
                             blurRadius: 4,
