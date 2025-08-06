@@ -50,9 +50,9 @@ dependencies:
   introduction_screen: ^3.1.17
   permission_handler: ^11.4.0
   grouped_list: ^6.0.0
-  uni_links3: ^0.5.3
+#  uni_links3: ^0.5.3
   flutter_native_splash: ^2.4.4
-
+  app_links: ^6.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
